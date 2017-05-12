@@ -2,7 +2,7 @@ var game = new Phaser.Game(640, 960, Phaser.CANVAS, '', { preload:
  preload, create: create, update: update });
 
 function preload() {
- 	 game.load.spritesheet('smplayer', 'assets/smr.png', 32, 49);
+ 	 game.load.spritesheet('smplayer', './assets/smr.png', 32, 49);
 }
 
 var platforms;
@@ -24,7 +24,7 @@ function create() {
   	player.body.gravity.y = 300;
   	player.body.collideWorldBounds = true;
   	cursors = game.input.keyboard.createCursorKeys();
-  	pad=game.game.plugins.add(Phaser.VirtualJoystick);
+  	// pad=game.Plugin.VirtualJoystick();
   	// 画面全屏
   	game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
 	game.scale.pageAlignHorizontally = true;
