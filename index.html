@@ -1,42 +1,30 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-
-  <meta charset="UTF-8">
-
-  <title>Phaser-FloatingText</title>
-	<meta http-equiv="X-UA-Compatible" content="chrome=1, IE=9">
-<!-- 	<meta name="format-detection" content="telephone=no">
-	<meta name="HandheldFriendly" content="true" />
-	<meta name="robots" content="noindex,nofollow" />
-	<meta name="apple-mobile-web-app-capable" content="yes" />
-	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
-	<meta name="apple-mobile-web-app-title" content="Phaser App">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta http-equiv="pragma" content="no-cache"/>
-	<meta name="apple-mobile-web-app-capable" content="yes" />
-	<meta name="mobile-web-app-capable" content="yes"> -->
-	<meta name="viewport" content=" width=device-width, initial-scale=1.0, maximum-scale=1.0, minimal-ui"/>
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <!-- <link href='http://fonts.googleapis.com/css?family=Luckiest+Guy' rel='stylesheet' type='text/css'>
-
-  <link rel='stylesheet prefetch' href='http://fonts.googleapis.com/css?family=Luckiest+Guy'> -->
-
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,minimal-ui"/>
+	<title>Monster Wants Candy demo</title>
+	<style> body { margin: 0; background: #B4D9E7; } </style>
+	<script src="src/phaser.min.js"></script>
+	<script src="src/phaser-touch-control.js"></script>
+	<script src="src/Boot.js"></script>
+	<script src="src/Preloader.js"></script>
+	<script src="src/MainMenu.js"></script>
+	<script src="src/Game.js"></script>
 </head>
-
 <body>
-
-
-
-<div style="font-family: Luckiest+Guy,cursive;visibility:hidden;opacity:0;position:fixed;"> &nbsp;</div>
-  <script src='phaser.min.js'></script>
-  <script src='http://netgfx.com/trunk/games/phaser_modals/modal.js'></script>
-  <script src="floatingText.js"></script>
-  <script src='core.js'></script>
-
-
-
+<script>
+(function() {
+	// initialize the framework
+	var game = new Phaser.Game(640, 960, Phaser.AUTO, 'game');
+	// add game states
+	game.state.add('Boot', Candy.Boot);
+	game.state.add('Preloader', Candy.Preloader);
+	game.state.add('MainMenu', Candy.MainMenu);
+	game.state.add('Game', Candy.Game);
+	// start the Boot state
+	game.state.start('Boot');
+})();
+</script>
 </body>
-
 </html>
