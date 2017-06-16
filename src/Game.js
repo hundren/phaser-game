@@ -31,6 +31,8 @@ Candy.Game.prototype = {
 		this.add.button(Candy.GAME_WIDTH-96-10, 5, 'button-pause', this.managePause, this);
 		// create the player
 		this._player = this.add.sprite(280, 760, 'monster-idle');
+		//player加入物理引擎
+		// this.game.physics.enable(this._player, Phaser.Physics.ARCADE);
 		// add player animation
 		this._player.animations.add('idle', [0,1,2,3,4,5,6,7,8,9,10,11,12], 10, true);
 		// play the animation
@@ -52,6 +54,7 @@ Candy.Game.prototype = {
 		this.drag = this.add.sprite(280, 400, 'drag');
 		this.drag.inputEnabled = true;
 		this.drag.input.enableDrag();
+
 	},
 	managePause: function(){
 		// pause the game
@@ -68,11 +71,12 @@ Candy.Game.prototype = {
 	},
 	update: function(){
             var speed = this.game.touchControl.speed;
-            console.log("xx",speed.x);
+            console.log("xx",speed.tap);
             if(speed.x==0){
             	this._playerFirstPosition=this._player.position.x;
             }
             this._player.position.x=speed.x+this._playerFirstPosition;
+            this._player.position.y+=1.2;
             // 坐标限制让它不要超出屏幕
             if(this._player.position.x<0){
             	this._player.position.x=0;
@@ -80,7 +84,23 @@ Candy.Game.prototype = {
             if(this._player.position.x>580){
             	this._player.position.x=580;
             }
+            if(this._player.position.y>760){
+            	this._player.position.y=760;
+            }
+
             console.log("playx",this._player.position.x);
+            console.log("playy",this._player.position.y);
+          //**********
+       //增加player高度
+       //**********
+       if(speed.tap==1){
+       		speed.tap=0;
+       		this._player.position.y-=2.2;
+       }
+       // this.input.onDown.add(function(){
+       // 		this._player.position.y-=0.02;
+       //  console.log("playy+++++++++=",this._player.position.y);
+       // },this);
 		// update timer every frame
 		this._spawnCandyTimer += this.time.elapsed;
 		// if spawn timer reach one second (1000 miliseconds)

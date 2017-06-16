@@ -70,7 +70,7 @@
 	};
 
 	Phaser.Plugin.TouchControl.prototype.speed = {
-		x:0, y:0
+		x:0, y:0,tap:0
 	};
 
 	Phaser.Plugin.TouchControl.prototype.inputEnable = function() {
@@ -111,7 +111,8 @@
 
 		this.speed.x = 0;
 		this.speed.y = 0;
-
+		this.speed.tap = 0;
+		
 		this.preUpdate=empty;
 	};
 
@@ -146,6 +147,7 @@
 		// this.speed.y = parseInt((deltaY/maxDistanceInPixels) * 100 * -1, 10);
 		this.speed.x = parseInt(deltaX, 10);
 		this.speed.y = parseInt(deltaY, 10);
+		this.speed.tap = 1;
 
 		this.cursors.up = (deltaY < 0);
 		this.cursors.down = (deltaY > 0);
