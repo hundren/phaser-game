@@ -1,6 +1,7 @@
 var easeInSpeed = function(x){
         return x * Math.abs(x) / 2000;
     };
+var reg = {};
 Candy.Game = function(game){
 	// define needed variables for Candy.Game
 	this._player = null;
@@ -8,11 +9,33 @@ Candy.Game = function(game){
 	this._spawnCandyTimer = 0;
 	this._fontStyle = null;
 	this._drag = null;
+	this.monster = null;
 	this._playerFirstPosition=280;
 	// define Candy variables to reuse them in Candy.item functions
 	Candy._scoreText = null;
 	Candy._score = 0;
 	Candy._health = 0;
+	Candy._battleHowls = [
+		"PAM!",
+		"BAM!",
+		"BANG!",
+		"BIFF!",
+		"BLOOP!",
+		"BONK!",
+		"CLASH!",
+		"CRASH!",
+		"KAPOW!",
+		"OOOFF!",
+		"POW!",
+		"WHACK!",
+		"WHAMM!",
+		"ZAM!",
+		"ZLOPP!",
+		"ZZWAP!",
+		"WHAP!",
+		"UGGH!",
+		"THWACK!"
+		];
 };
 Candy.Game.prototype = {
 	create: function(){
@@ -33,6 +56,10 @@ Candy.Game.prototype = {
 		this._player = this.add.sprite(280, 760, 'monster-idle');
 		//player加入物理引擎
 		// this.game.physics.enable(this._player, Phaser.Physics.ARCADE);
+		// this._player.body.collideWorldBounds = true;
+		// this._player.body.bounce.y = 0.8;
+		// this._player.body.bounce.x = 1;
+		// this._player.body.gravity.y = 50;
 		// add player animation
 		this._player.animations.add('idle', [0,1,2,3,4,5,6,7,8,9,10,11,12], 10, true);
 		// play the animation
@@ -54,7 +81,58 @@ Candy.Game.prototype = {
 		this.drag = this.add.sprite(280, 400, 'drag');
 		this.drag.inputEnabled = true;
 		this.drag.input.enableDrag();
-
+		// 加入怪兽
+    	this.monster = this.add.sprite(0, 0, "player1", "SlimeMonster01");
+    	this.monster.scale.setTo(0.6, 0.6);
+    	this.monster.x = this.game.width / 2 - this.monster.width / 2;
+    	this.monster.y = this.monster.height - 6;
+    	this.monster.animations.add("idles", ["SlimeMonster01", "SlimeMonster02"], 4, true, true);
+    	this.monster.animations.play("idles");
+   	    this.monster.inputEnabled = true;
+   	    this.monster.events.onInputDown.add(function() {
+	        var dmg = this.game.rnd.integerInRange(100, 1000);
+	        var timeToLive = 200;
+	        var masterEffect="physics";
+	        var effect = masterEffect;
+	        var bg = false;
+	        var bgColor = 0xfec72a;
+	        if (dmg > 800) {
+	            effect = masterEffect === "smoke" ? "explode" : "smoke";
+	            timeToLive = 600;
+	            dmg = Phaser.ArrayUtils.getRandomItem(Candy._battleHowls);
+	        }
+	        if(masterEffect === "physics") {
+	            bg = true;
+	        }
+	        var rand = this.game.rnd.integerInRange(0,1);
+	        var val = this.monster.x + (this.monster.width * rand);
+	        var targetX = val;
+	        
+	        new FloatingText(this, {
+	            text: dmg,
+	            // sprite: coins,
+	            // spriteAnimationName:"idle",
+	            spriteAnimationFrames: Phaser.Animation.generateFrameNames("Coins-", 1, 7, '', 0),
+	            spriteAnimationFrameRate: 14,
+	            animation: effect,
+	            textOptions: {
+	                fontSize: 32,
+	                fill: "#ff18aa",
+	                stroke: "#ffffff",
+	                strokeThickness: 1,
+	                wordWrap: true,
+	                wordWrapWidth: 200,
+	                font: "Luckiest Guy"
+	            },
+	            // spriteAnchor: 0.5,
+	            // rotation: 15,
+	            hasBackground: bg,
+	            backgroundColor: bgColor,
+	            x: this.monster.x + this.monster.width / 2,
+	            y: this.monster.y - 20,
+	            timeToLive: timeToLive
+	        })
+	    }, this);
 	},
 	managePause: function(){
 		// pause the game
@@ -71,36 +149,80 @@ Candy.Game.prototype = {
 	},
 	update: function(){
             var speed = this.game.touchControl.speed;
-            console.log("xx",speed.tap);
+            // console.log("xx",speed.tap);
             if(speed.x==0){
             	this._playerFirstPosition=this._player.position.x;
             }
             this._player.position.x=speed.x+this._playerFirstPosition;
-            this._player.position.y+=1.2;
+            this._player.position.y+=2.2;
             // 坐标限制让它不要超出屏幕
             if(this._player.position.x<0){
             	this._player.position.x=0;
             }
-            if(this._player.position.x>580){
-            	this._player.position.x=580;
+            if(this._player.position.x>534){
+            	this._player.position.x=534;
             }
             if(this._player.position.y>760){
             	this._player.position.y=760;
             }
-
-            console.log("playx",this._player.position.x);
+            // 限制角色跳的高度
+            if(this._player.position.y<230){
+            	this._player.position.y=230;
+            }
+            if(this._player.position.y==230){
             console.log("playy",this._player.position.y);
-          //**********
+            	var dmg = this.game.rnd.integerInRange(100, 1000);
+		        var timeToLive = 200;
+		        var masterEffect="physics";
+		        var effect = masterEffect;
+		        var bg = false;
+		        var bgColor = 0xfec72a;
+		        if (dmg > 800) {
+		            effect = masterEffect === "smoke" ? "explode" : "smoke";
+		            timeToLive = 600;
+		            dmg = Phaser.ArrayUtils.getRandomItem(Candy._battleHowls);
+		        }
+		        if(masterEffect === "physics") {
+		            bg = true;
+		        }
+		        var rand = this.game.rnd.integerInRange(0,1);
+		        var val = this.monster.x + (this.monster.width * rand);
+		        var targetX = val;
+		        
+		        new FloatingText(this, {
+		            text: dmg,
+		            // sprite: coins,
+		            // spriteAnimationName:"idle",
+		            spriteAnimationFrames: Phaser.Animation.generateFrameNames("Coins-", 1, 7, '', 0),
+		            spriteAnimationFrameRate: 14,
+		            animation: effect,
+		            textOptions: {
+		                fontSize: 32,
+		                fill: "#ff18aa",
+		                stroke: "#ffffff",
+		                strokeThickness: 1,
+		                wordWrap: true,
+		                wordWrapWidth: 200,
+		                font: "Luckiest Guy"
+		            },
+		            // spriteAnchor: 0.5,
+		            // rotation: 15,
+		            hasBackground: bg,
+		            backgroundColor: bgColor,
+		            x: this.monster.x + this.monster.width / 2,
+		            y: this.monster.y - 20,
+		            timeToLive: timeToLive
+		        })
+            }
+            // console.log("playx",this._player.position.x);
+            // console.log("playy",this._player.position.y);
+       //**********
        //增加player高度
        //**********
        if(speed.tap==1){
        		speed.tap=0;
-       		this._player.position.y-=2.2;
+       		this._player.position.y-=50.2;
        }
-       // this.input.onDown.add(function(){
-       // 		this._player.position.y-=0.02;
-       //  console.log("playy+++++++++=",this._player.position.y);
-       // },this);
 		// update timer every frame
 		this._spawnCandyTimer += this.time.elapsed;
 		// if spawn timer reach one second (1000 miliseconds)
@@ -115,13 +237,7 @@ Candy.Game.prototype = {
 			// to rotate them accordingly
 			candy.angle += candy.rotateMe;
 		});
-		// if the health of the player drops to 0, the player dies = game over
-		// if(!Candy._health) {
-		// 	// show the game over message
-		// 	this.add.sprite((Candy.GAME_WIDTH-594)/2, (Candy.GAME_HEIGHT-271)/2, 'game-over');
-		// 	// pause the game
-		// 	this.game.paused = true;
-		// }
+		
 	}
 };
 
@@ -141,6 +257,9 @@ Candy.item = {
 		candy.animations.play('anim');
 		// enable candy body for physic engine
 		game.physics.enable(candy, Phaser.Physics.ARCADE);
+		candy.body.collideWorldBounds = true;
+		candy.body.bounce.y = 0.8;
+		candy.body.bounce.x = 1;
 		// enable candy to be clicked/tapped
 		candy.inputEnabled = true;
 		// add event listener to click/tap

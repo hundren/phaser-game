@@ -95,7 +95,8 @@
 		// }, this);
 
 		this.preUpdate=setDirection.bind(this);
-
+		this.speed.tap = 1;
+		
 		initialPoint=this.input.activePointer.position.clone();
 
 	};
@@ -147,7 +148,6 @@
 		// this.speed.y = parseInt((deltaY/maxDistanceInPixels) * 100 * -1, 10);
 		this.speed.x = parseInt(deltaX, 10);
 		this.speed.y = parseInt(deltaY, 10);
-		this.speed.tap = 1;
 
 		this.cursors.up = (deltaY < 0);
 		this.cursors.down = (deltaY > 0);

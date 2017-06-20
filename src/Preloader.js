@@ -22,6 +22,7 @@ Candy.Preloader.prototype = {
 		this.load.spritesheet('candy', 'img/candy.png', 82, 98);
 		this.load.spritesheet('monster-idle', 'img/monster-idle.png', 103, 131);
 		this.load.spritesheet('button-start', 'img/button-start.png', 401, 143);
+  		this.load.atlasJSONHash("player1", "img/char.png", "img/char.json");
 	},
 	create: function(){
 		// start the MainMenu state
