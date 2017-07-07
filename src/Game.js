@@ -10,11 +10,13 @@ Candy.Game = function(game){
 	this._fontStyle = null;
 	this._drag = null;
 	this.monster = null;
+	this.mosterDirection="right";
 	this._playerFirstPosition=280;
 	// define Candy variables to reuse them in Candy.item functions
 	Candy._scoreText = null;
 	Candy._score = 0;
 	Candy._health = 0;
+	Candy.killTime = 0;
 	Candy._battleHowls = [
 		"PAM!",
 		"BAM!",
@@ -169,7 +171,8 @@ Candy.Game.prototype = {
             if(this._player.position.y<230){
             	this._player.position.y=230;
             }
-            if(this._player.position.y==230){
+            //角色碰到怪兽有效果弹出
+            if(this._player.position.y==230&&(this._player.position.x>(this.monster.x-this.monster.x/3)&&this._player.position.x<(this.monster.x+this.monster.x/3))){
             console.log("playy",this._player.position.y);
             	var dmg = this.game.rnd.integerInRange(100, 1000);
 		        var timeToLive = 200;
@@ -233,12 +236,35 @@ Candy.Game.prototype = {
 			Candy.item.spawnCandy(this);
 		}
 		// loop through all candy on the screen
+		var that=this;
 		this._candyGroup.forEach(function(candy){
 			// to rotate them accordingly
 			candy.angle += candy.rotateMe;
+			if(candy.position.x<(that._player.position.x+that._player.width)&&candy.position.x>(that._player.position.x)&&candy.position.y>(that._player.position.y)&&candy.position.y<(that._player.position.y+that._player.height)){
+  				candy.kill();
+				candy.position.x=0;
+				candy.position.y=0;
+				Candy._score += 1;
+  			    Candy._scoreText.setText(Candy._score);
+			}
 		});
-		
-	}
+		// 怪兽x坐标随机移动
+		if(this.mosterDirection=='right'){
+			this.monster.x+=0.9;
+			if(this.monster.x>(this.game.width-this.monster.x / 2)){
+				this.mosterDirection='left';
+			}
+		}else{
+			this.monster.x-=0.9;
+			if(this.monster.x<this.monster.x/2){
+				this.mosterDirection='right';
+			}
+		}
+		// 吃蛋糕
+  		this.physics.arcade.overlap(this._player, this._candyGroup, this.collectStar);
+
+	},
+
 };
 
 Candy.item = {
@@ -263,7 +289,7 @@ Candy.item = {
 		// enable candy to be clicked/tapped
 		candy.inputEnabled = true;
 		// add event listener to click/tap
-		candy.events.onInputDown.add(this.clickCandy, this);
+		// candy.events.onInputDown.add(this.clickCandy, this);
 		// be sure that the candy will fire an event when it goes out of the screen
 		candy.checkWorldBounds = true;
 		// reset candy when it goes out of screen
@@ -275,7 +301,7 @@ Candy.item = {
 		// add candy to the group
 		game._candyGroup.add(candy);
 	},
-	clickCandy: function(candy){
+	clickCandy: function(monster,candy){
 		// kill the candy when it's clicked
 		candy.kill();
 		// add points to the score
