@@ -12,6 +12,7 @@ Candy.Game = function(game){
 	this.monster = null;
 	this.mosterDirection="right";
 	this._playerFirstPosition=280;
+	this.trun=true;
 	// define Candy variables to reuse them in Candy.item functions
 	Candy._scoreText = null;
 	Candy._score = 0;
@@ -151,7 +152,7 @@ Candy.Game.prototype = {
 	},
 	update: function(){
             var speed = this.game.touchControl.speed;
-            // console.log("xx",speed.tap);
+            console.log("xx",speed.tap);
             if(speed.x==0){
             	this._playerFirstPosition=this._player.position.x;
             }
@@ -223,8 +224,8 @@ Candy.Game.prototype = {
        //增加player高度
        //**********
        if(speed.tap==1){
-       		speed.tap=0;
-       		this._player.position.y-=50.2;
+       		// speed.tap=0;
+       		this._player.position.y-=3.2;
        }
 		// update timer every frame
 		this._spawnCandyTimer += this.time.elapsed;
@@ -240,6 +241,25 @@ Candy.Game.prototype = {
 		this._candyGroup.forEach(function(candy){
 			// to rotate them accordingly
 			candy.angle += candy.rotateMe;
+			//随机蛋糕左右
+			// var lrRandom=Math.floor(Math.random()*100);
+			
+			// console.log("lr",lrRandom);
+			// if(this.trun){
+			// 	candy.body.velocity.x+=Math.floor(Math.random()*10);
+			// }
+			// else{
+			// 	candy.body.velocity.x-=Math.floor(Math.random()*10);
+			// }
+
+			// if(lrRandom==5){
+			// 	this.trun=false;
+			// }else if(lrRandom==8){
+			// 	this.trun=true;
+			// }
+			
+
+			
 			if(candy.position.x<(that._player.position.x+that._player.width)&&candy.position.x>(that._player.position.x)&&candy.position.y>(that._player.position.y)&&candy.position.y<(that._player.position.y+that._player.height)){
   				candy.kill();
 				candy.position.x=0;
@@ -248,6 +268,8 @@ Candy.Game.prototype = {
   			    Candy._scoreText.setText(Candy._score);
 			}
 		});
+		//互相物理碰撞开关
+		// this.game.physics.arcade.collide(this._candyGroup);
 		// 怪兽x坐标随机移动
 		if(this.mosterDirection=='right'){
 			this.monster.x+=0.9;
