@@ -10,6 +10,10 @@ Candy.Game = function(game){
 	this._fontStyle = null;
 	this._drag = null;
 	this.monster = null;
+	this.mosterLife=null;
+	this.hitCount=0;
+	this.coins=null;
+	this.light=null;
 	this.mosterDirection="right";
 	this._playerFirstPosition=280;
 	this.trun=true;
@@ -84,6 +88,19 @@ Candy.Game.prototype = {
 		this.drag = this.add.sprite(280, 400, 'drag');
 		this.drag.inputEnabled = true;
 		this.drag.input.enableDrag();
+		//加入怪兽血条
+		this.mosterLife=this.add.sprite(0, 0, 'monsterLife');
+		this.mosterLife.crop(new Phaser.Rectangle(0, 0, 400, 10));
+		this.mosterLife.x = this.game.width / 2;
+    	this.mosterLife.y = this.mosterLife.height+90;
+		// 加入硬币
+		this.coins = this.add.sprite(0,0,"coins","Coins-1");
+	    this.coins.anchor.setTo(0.5);
+	    this.coins.animations.add('idle', Phaser.Animation.generateFrameNames("Coins-", 1, 7, '', 0), 14, true, true);
+	    this.coins.visible = false;
+	    // 加入怪兽吸引光线
+	    this.light=this.add.sprite(100,250,"light")
+	    this.light.scale.setTo(2.6);
 		// 加入怪兽
     	this.monster = this.add.sprite(0, 0, "player1", "SlimeMonster01");
     	this.monster.scale.setTo(0.6, 0.6);
@@ -113,8 +130,8 @@ Candy.Game.prototype = {
 	        
 	        new FloatingText(this, {
 	            text: dmg,
-	            // sprite: coins,
-	            // spriteAnimationName:"idle",
+	            sprite: coins,
+	            spriteAnimationName:"idle",
 	            spriteAnimationFrames: Phaser.Animation.generateFrameNames("Coins-", 1, 7, '', 0),
 	            spriteAnimationFrameRate: 14,
 	            animation: effect,
@@ -127,8 +144,8 @@ Candy.Game.prototype = {
 	                wordWrapWidth: 200,
 	                font: "Luckiest Guy"
 	            },
-	            // spriteAnchor: 0.5,
-	            // rotation: 15,
+	            spriteAnchor: 0.5,
+	            rotation: 15,
 	            hasBackground: bg,
 	            backgroundColor: bgColor,
 	            x: this.monster.x + this.monster.width / 2,
@@ -152,6 +169,8 @@ Candy.Game.prototype = {
 	},
 	update: function(){
             var speed = this.game.touchControl.speed;
+            //打击计数器
+            this.hitCount+=1;
             console.log("xx",speed.tap);
             if(speed.x==0){
             	this._playerFirstPosition=this._player.position.x;
@@ -173,8 +192,8 @@ Candy.Game.prototype = {
             	this._player.position.y=230;
             }
             //角色碰到怪兽有效果弹出
-            if(this._player.position.y==230&&(this._player.position.x>(this.monster.x-this.monster.x/3)&&this._player.position.x<(this.monster.x+this.monster.x/3))){
-            console.log("playy",this._player.position.y);
+            if(this._player.position.y==230&&(this._player.position.x>(this.monster.x-this.monster.x/3)&&this._player.position.x<(this.monster.x+this.monster.x/3))&&this.hitCount%30==0){
+            console.log("playy",this.hitCount);
             	var dmg = this.game.rnd.integerInRange(100, 1000);
 		        var timeToLive = 200;
 		        var masterEffect="physics";
@@ -195,7 +214,7 @@ Candy.Game.prototype = {
 		        
 		        new FloatingText(this, {
 		            text: dmg,
-		            // sprite: coins,
+		            // sprite: this.coins,
 		            // spriteAnimationName:"idle",
 		            spriteAnimationFrames: Phaser.Animation.generateFrameNames("Coins-", 1, 7, '', 0),
 		            spriteAnimationFrameRate: 14,
@@ -217,6 +236,10 @@ Candy.Game.prototype = {
 		            y: this.monster.y - 20,
 		            timeToLive: timeToLive
 		        })
+		        // 血条减少
+				if(this.mosterLife.cropRect.width>0){
+					this.mosterLife.cropRect.width -= 3;
+				}
             }
             // console.log("playx",this._player.position.x);
             // console.log("playy",this._player.position.y);
@@ -225,7 +248,7 @@ Candy.Game.prototype = {
        //**********
        if(speed.tap==1){
        		// speed.tap=0;
-       		this._player.position.y-=3.2;
+       		this._player.position.y-=3.9;
        }
 		// update timer every frame
 		this._spawnCandyTimer += this.time.elapsed;
@@ -237,6 +260,7 @@ Candy.Game.prototype = {
 			Candy.item.spawnCandy(this);
 		}
 		// loop through all candy on the screen
+		// 吃了蛋糕
 		var that=this;
 		this._candyGroup.forEach(function(candy){
 			// to rotate them accordingly
@@ -257,9 +281,6 @@ Candy.Game.prototype = {
 			// }else if(lrRandom==8){
 			// 	this.trun=true;
 			// }
-			
-
-			
 			if(candy.position.x<(that._player.position.x+that._player.width)&&candy.position.x>(that._player.position.x)&&candy.position.y>(that._player.position.y)&&candy.position.y<(that._player.position.y+that._player.height)){
   				candy.kill();
 				candy.position.x=0;
@@ -282,6 +303,9 @@ Candy.Game.prototype = {
 				this.mosterDirection='right';
 			}
 		}
+		this.mosterLife.x=this.monster.x+23;
+		
+        this.mosterLife.updateCrop();
 		// 吃蛋糕
   		this.physics.arcade.overlap(this._player, this._candyGroup, this.collectStar);
 
