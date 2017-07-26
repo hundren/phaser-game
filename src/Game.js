@@ -10,10 +10,11 @@ Candy.Game = function(game){
 	this._fontStyle = null;
 	this._drag = null;
 	this.monster = null;
-	this.mosterLife=null;
+	this.monsterLife=null;
 	this.hitCount=0;
 	this.coins=null;
 	this.light=null;
+	this.showLight=true;
 	this.mosterDirection="right";
 	this._playerFirstPosition=280;
 	this.trun=true;
@@ -89,10 +90,11 @@ Candy.Game.prototype = {
 		this.drag.inputEnabled = true;
 		this.drag.input.enableDrag();
 		//加入怪兽血条
-		this.mosterLife=this.add.sprite(0, 0, 'monsterLife');
-		this.mosterLife.crop(new Phaser.Rectangle(0, 0, 400, 10));
-		this.mosterLife.x = this.game.width / 2;
-    	this.mosterLife.y = this.mosterLife.height+90;
+		this.monsterLife=this.add.sprite(0, 0, 'monsterLife');
+		this.monsterLife.health=100;
+		this.monsterLife.crop(new Phaser.Rectangle(0, 0, 100, 10));
+		this.monsterLife.x = this.game.width / 2;
+    	this.monsterLife.y = this.monsterLife.height+90;
 		// 加入硬币
 		this.coins = this.add.sprite(0,0,"coins","Coins-1");
 	    this.coins.anchor.setTo(0.5);
@@ -101,6 +103,7 @@ Candy.Game.prototype = {
 	    // 加入怪兽吸引光线
 	    this.light=this.add.sprite(100,250,"light")
 	    this.light.scale.setTo(2.6);
+	    this.light.visible = false;
 		// 加入怪兽
     	this.monster = this.add.sprite(0, 0, "player1", "SlimeMonster01");
     	this.monster.scale.setTo(0.6, 0.6);
@@ -171,7 +174,7 @@ Candy.Game.prototype = {
             var speed = this.game.touchControl.speed;
             //打击计数器
             this.hitCount+=1;
-            console.log("xx",speed.tap);
+            // console.log("xx",speed.tap);
             if(speed.x==0){
             	this._playerFirstPosition=this._player.position.x;
             }
@@ -237,8 +240,8 @@ Candy.Game.prototype = {
 		            timeToLive: timeToLive
 		        })
 		        // 血条减少
-				if(this.mosterLife.cropRect.width>0){
-					this.mosterLife.cropRect.width -= 3;
+				if(this.monsterLife.cropRect.width>0){
+					this.monsterLife.cropRect.width -= 0.5;
 				}
             }
             // console.log("playx",this._player.position.x);
@@ -253,7 +256,7 @@ Candy.Game.prototype = {
 		// update timer every frame
 		this._spawnCandyTimer += this.time.elapsed;
 		// if spawn timer reach one second (1000 miliseconds)
-		if(this._spawnCandyTimer > 1000) {
+		if(this._spawnCandyTimer > 1500) {	
 			// reset it
 			this._spawnCandyTimer = 0;
 			// and spawn new candy
@@ -266,46 +269,66 @@ Candy.Game.prototype = {
 			// to rotate them accordingly
 			candy.angle += candy.rotateMe;
 			//随机蛋糕左右
-			// var lrRandom=Math.floor(Math.random()*100);
-			
-			// console.log("lr",lrRandom);
-			// if(this.trun){
-			// 	candy.body.velocity.x+=Math.floor(Math.random()*10);
-			// }
-			// else{
-			// 	candy.body.velocity.x-=Math.floor(Math.random()*10);
-			// }
-
-			// if(lrRandom==5){
-			// 	this.trun=false;
-			// }else if(lrRandom==8){
-			// 	this.trun=true;
-			// }
 			if(candy.position.x<(that._player.position.x+that._player.width)&&candy.position.x>(that._player.position.x)&&candy.position.y>(that._player.position.y)&&candy.position.y<(that._player.position.y+that._player.height)){
-  				candy.kill();
-				candy.position.x=0;
-				candy.position.y=0;
-				Candy._score += 1;
-  			    Candy._scoreText.setText(Candy._score);
+					that._candyGroup.removeChild(candy);
+					Candy._score += 1;
+	  			    Candy._scoreText.setText(Candy._score);
+			}
+			// 死了的蛋糕就给怪物吃
+			if(!candy.alive){
+				if(candy.position.x<(that.monster.position.x+that.monster.width)&&candy.position.x>that.monster.position.x&&candy.position.y>that.monster.position.y&&candy.position.y<(that.monster.position.y+that.monster.height)){
+					that._candyGroup.removeChild(candy);
+					if(that.monsterLife.cropRect.width+30<100){
+						that.monsterLife.cropRect.width+=30;
+					}else{
+						that.monsterLife.cropRect.width=100;
+					}
+				}else if(candy.position.y<candy.height-40){
+					that._candyGroup.removeChild(candy);
+				}
 			}
 		});
 		//互相物理碰撞开关
 		// this.game.physics.arcade.collide(this._candyGroup);
-		// 怪兽x坐标随机移动
-		if(this.mosterDirection=='right'){
-			this.monster.x+=0.9;
-			if(this.monster.x>(this.game.width-this.monster.x / 2)){
-				this.mosterDirection='left';
-			}
-		}else{
-			this.monster.x-=0.9;
-			if(this.monster.x<this.monster.x/2){
-				this.mosterDirection='right';
-			}
-		}
-		this.mosterLife.x=this.monster.x+23;
 		
-        this.mosterLife.updateCrop();
+		this.monsterLife.x=this.monster.x+23;
+		this.light.x=this.monster.x-90;
+		var lightRan=Math.floor(Math.random()*200);
+		// var lightRan=25;
+		if(lightRan==25){
+			this.light.visible=true;
+			this.showLight=false;
+			setTimeout(function(){
+				that.showLight=true;
+			},2000);
+			//吸起不弹起来的蛋糕
+		this._candyGroup.forEach(function(candy){
+			// console.log('candyheight',candy.height,'candyy',candy.position.y,'gameheight',that.game.height);
+			if(candy.position.y>(that.game.height-candy.height)&&(candy.position.x>that.monster.x&&candy.position.x<that.monster.x+180)){
+				// candy.position.y-=20;
+				candy.body.gravity.y = -350;
+				candy.alive=false;
+			}	
+		})
+		}else{
+			if(this.showLight){
+					this.light.visible=false;
+				// 怪兽x坐标随机移动
+				if(this.mosterDirection=='right'){
+					this.monster.x+=0.9;
+					if(this.monster.x>(this.game.width-this.monster.width)){
+						this.mosterDirection='left';
+					}
+				}else{
+					this.monster.x-=0.9;
+					if(this.monster.x<0){
+						this.mosterDirection='right';
+					}
+				}
+			}
+			
+		}
+        this.monsterLife.updateCrop();
 		// 吃蛋糕
   		this.physics.arcade.overlap(this._player, this._candyGroup, this.collectStar);
 
