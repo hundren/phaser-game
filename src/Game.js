@@ -10,14 +10,21 @@ Candy.Game = function(game){
 	this._fontStyle = null;
 	this._drag = null;
 	this.monster = null;
-	this.monsterLife=null;
-	this.hitCount=0;
-	this.coins=null;
-	this.light=null;
-	this.showLight=true;
-	this.mosterDirection="right";
-	this._playerFirstPosition=280;
-	this.trun=true;
+	this.monsterLife = null;
+	this.hitCount = 0;
+	this.coins = null;
+	this.light = null;
+	this.showLight = true;
+	this.mosterDirection = "right";
+	this._playerFirstPosition = 280;
+	this.trun = true;
+	this.nopush = null;
+	this.canpush = null;
+	//中心蓄力圆圈
+	this.circle = null;
+	this.angle = { min: 1.6, max: 1.6 };
+	// 背景圆
+	this.circleBg = null;
 	// define Candy variables to reuse them in Candy.item functions
 	Candy._scoreText = null;
 	Candy._score = 0;
@@ -89,6 +96,17 @@ Candy.Game.prototype = {
 		this.drag = this.add.sprite(280, 400, 'drag');
 		this.drag.inputEnabled = true;
 		this.drag.input.enableDrag();
+		//加入蓄力圆圈
+		this.circleBg = this.game.add.graphics(0,0);
+		this.circleBg.clear();
+		this.circleBg.lineStyle(20, 0x0b1638);
+		this.circleBg.arc(this.game.width / 2, this.game.height / 1.5, 56, 0, 7, false, 128);
+		this.circleBg.endFill();
+		this.circle = this.game.add.graphics(0, 0);
+		//加入美少女按钮
+		this.nopush = this.add.sprite((this.game.width / 2)-50, this.game.height / 1.5-50, 'cannotpush');
+		this.canpush = this.add.sprite((this.game.width / 2)-50, this.game.height / 1.5-50, 'canpush');
+		this.canpush.visible = false;
 		//加入怪兽血条
 		this.monsterLife=this.add.sprite(0, 0, 'monsterLife');
 		this.monsterLife.health=100;
@@ -243,6 +261,7 @@ Candy.Game.prototype = {
 				if(this.monsterLife.cropRect.width>0){
 					this.monsterLife.cropRect.width -= 0.5;
 				}
+
             }
             // console.log("playx",this._player.position.x);
             // console.log("playy",this._player.position.y);
@@ -252,7 +271,31 @@ Candy.Game.prototype = {
        if(speed.tap==1){
        		// speed.tap=0;
        		this._player.position.y-=3.9;
+       		this.angle.max+=0.02;
+       		//圆圈增加
+			// this.add.tween(this.angle).to( { max: 360 }, 6000, "Linear", true, 0, -1, false);
+
+			console.log(this.angle.min);
+			this.circle.clear();
+		    this.circle.lineStyle(10, 0xfcbf1f);
+		    // this.circle.beginFill(0xa000f3);
+		    this.circle.arc(this.game.width / 2, this.game.height / 1.5, 55, this.angle.min, this.angle.max, false, 128);
+
+			// console.log(this.angle.max);
+		    this.circle.endFill();
        }
+       // 圆圈自减
+       if(this.angle.max>1.6){
+       		this.angle.max-=0.01;
+			this.circle.clear();
+		    this.circle.lineStyle(10, 0xfcbf1f);
+		    if(this.angle.max>1.6){
+		    this.circle.arc(this.game.width / 2, this.game.height / 1.5, 55, this.angle.min, this.angle.max, false,128);
+		    }
+			console.log('out',this.angle.max);
+		    this.circle.endFill();
+       }
+       
 		// update timer every frame
 		this._spawnCandyTimer += this.time.elapsed;
 		// if spawn timer reach one second (1000 miliseconds)
@@ -307,7 +350,7 @@ Candy.Game.prototype = {
 			if(candy.position.y>(that.game.height-candy.height)&&(candy.position.x>that.monster.x&&candy.position.x<that.monster.x+180)){
 				// candy.position.y-=20;
 				candy.body.gravity.y = -350;
-				candy.alive=false;
+				candy.alive = false;
 			}	
 		})
 		}else{
@@ -331,7 +374,7 @@ Candy.Game.prototype = {
         this.monsterLife.updateCrop();
 		// 吃蛋糕
   		this.physics.arcade.overlap(this._player, this._candyGroup, this.collectStar);
-
+  		
 	},
 
 };

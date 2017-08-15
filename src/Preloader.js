@@ -20,6 +20,9 @@ Candy.Preloader.prototype = {
 		this.load.image('drag', 'img/tuo.png');
 		this.load.image('monsterLife', 'img/greenLife.png');
 		this.load.image('light', 'img/comeLight.png');
+		// 美少女点击按钮
+		this.load.image('canpush', 'img/wa.png');
+		this.load.image('cannotpush', 'img/wb.png');
 
 		// load spritesheets
 		this.load.spritesheet('candy', 'img/candy.png', 82, 98);
