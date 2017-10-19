@@ -100,13 +100,16 @@ Candy.Game.prototype = {
 		this.circleBg = this.game.add.graphics(0,0);
 		this.circleBg.clear();
 		this.circleBg.lineStyle(20, 0x0b1638);
-		this.circleBg.arc(this.game.width / 2, this.game.height / 1.5, 56, 0, 7, false, 128);
+		this.circleBg.arc(0, 0, 56, 0, 7, false, 128);
 		this.circleBg.endFill();
 		this.circle = this.game.add.graphics(0, 0);
+		// this.circleBg.enableDrag();
 		//加入美少女按钮
 		this.nopush = this.add.sprite((this.game.width / 2)-50, this.game.height / 1.5-50, 'cannotpush');
 		this.canpush = this.add.sprite((this.game.width / 2)-50, this.game.height / 1.5-50, 'canpush');
 		this.canpush.visible = false;
+		this.nopush.inputEnabled = true;
+		this.nopush.input.enableDrag();
 		//加入怪兽血条
 		this.monsterLife=this.add.sprite(0, 0, 'monsterLife');
 		this.monsterLife.health=100;
@@ -131,48 +134,52 @@ Candy.Game.prototype = {
     	this.monster.animations.play("idles");
    	    this.monster.inputEnabled = true;
    	    this.monster.events.onInputDown.add(function() {
-	        var dmg = this.game.rnd.integerInRange(100, 1000);
-	        var timeToLive = 200;
-	        var masterEffect="physics";
-	        var effect = masterEffect;
-	        var bg = false;
-	        var bgColor = 0xfec72a;
-	        if (dmg > 800) {
-	            effect = masterEffect === "smoke" ? "explode" : "smoke";
-	            timeToLive = 600;
-	            dmg = Phaser.ArrayUtils.getRandomItem(Candy._battleHowls);
-	        }
-	        if(masterEffect === "physics") {
-	            bg = true;
-	        }
-	        var rand = this.game.rnd.integerInRange(0,1);
-	        var val = this.monster.x + (this.monster.width * rand);
-	        var targetX = val;
-	        
-	        new FloatingText(this, {
-	            text: dmg,
-	            sprite: coins,
-	            spriteAnimationName:"idle",
-	            spriteAnimationFrames: Phaser.Animation.generateFrameNames("Coins-", 1, 7, '', 0),
-	            spriteAnimationFrameRate: 14,
-	            animation: effect,
-	            textOptions: {
-	                fontSize: 32,
-	                fill: "#ff18aa",
-	                stroke: "#ffffff",
-	                strokeThickness: 1,
-	                wordWrap: true,
-	                wordWrapWidth: 200,
-	                font: "Luckiest Guy"
-	            },
-	            spriteAnchor: 0.5,
-	            rotation: 15,
-	            hasBackground: bg,
-	            backgroundColor: bgColor,
-	            x: this.monster.x + this.monster.width / 2,
-	            y: this.monster.y - 20,
-	            timeToLive: timeToLive
-	        })
+			var dmg = this.game.rnd.integerInRange(100, 1000);
+			var timeToLive = 200;
+			var masterEffect="physics";
+			var effect = masterEffect;
+			var bg = false;
+			var bgColor = 0xfec72a;
+			if (dmg > 800) {
+				effect = masterEffect === "smoke" ? "explode" : "smoke";
+				timeToLive = 600;
+				dmg = Phaser.ArrayUtils.getRandomItem(Candy._battleHowls);
+			}
+			if(masterEffect === "physics") {
+				bg = true;
+			}
+			var rand = this.game.rnd.integerInRange(0,1);
+			var val = this.monster.x + (this.monster.width * rand);
+			var targetX = val;
+			
+			new FloatingText(this, {
+				text: dmg,
+				// sprite: this.coins,
+				// spriteAnimationName:"idle",
+				spriteAnimationFrames: Phaser.Animation.generateFrameNames("Coins-", 1, 7, '', 0),
+				spriteAnimationFrameRate: 14,
+				animation: effect,
+				textOptions: {
+					fontSize: 32,
+					fill: "#ff18aa",
+					stroke: "#ffffff",
+					strokeThickness: 1,
+					wordWrap: true,
+					wordWrapWidth: 200,
+					font: "Luckiest Guy"
+				},
+				// spriteAnchor: 0.5,
+				// rotation: 15,
+				hasBackground: bg,
+				backgroundColor: bgColor,
+				x: this.monster.x + this.monster.width / 2,
+				y: this.monster.y - 20,
+				timeToLive: timeToLive
+			})
+			// 血条减少
+			if(this.monsterLife.cropRect.width>0){
+				this.monsterLife.cropRect.width -= 0.5;
+			}
 	    }, this);
 	},
 	managePause: function(){
@@ -193,95 +200,36 @@ Candy.Game.prototype = {
             //打击计数器
             this.hitCount+=1;
             // console.log("xx",speed.tap);
-            if(speed.x==0){
-            	this._playerFirstPosition=this._player.position.x;
-            }
-            this._player.position.x=speed.x+this._playerFirstPosition;
-            this._player.position.y+=2.2;
-            // 坐标限制让它不要超出屏幕
-            if(this._player.position.x<0){
-            	this._player.position.x=0;
-            }
-            if(this._player.position.x>534){
-            	this._player.position.x=534;
-            }
-            if(this._player.position.y>760){
-            	this._player.position.y=760;
-            }
-            // 限制角色跳的高度
-            if(this._player.position.y<230){
-            	this._player.position.y=230;
-            }
-            //角色碰到怪兽有效果弹出
-            if(this._player.position.y==230&&(this._player.position.x>(this.monster.x-this.monster.x/3)&&this._player.position.x<(this.monster.x+this.monster.x/3))&&this.hitCount%30==0){
-            console.log("playy",this.hitCount);
-            	var dmg = this.game.rnd.integerInRange(100, 1000);
-		        var timeToLive = 200;
-		        var masterEffect="physics";
-		        var effect = masterEffect;
-		        var bg = false;
-		        var bgColor = 0xfec72a;
-		        if (dmg > 800) {
-		            effect = masterEffect === "smoke" ? "explode" : "smoke";
-		            timeToLive = 600;
-		            dmg = Phaser.ArrayUtils.getRandomItem(Candy._battleHowls);
-		        }
-		        if(masterEffect === "physics") {
-		            bg = true;
-		        }
-		        var rand = this.game.rnd.integerInRange(0,1);
-		        var val = this.monster.x + (this.monster.width * rand);
-		        var targetX = val;
-		        
-		        new FloatingText(this, {
-		            text: dmg,
-		            // sprite: this.coins,
-		            // spriteAnimationName:"idle",
-		            spriteAnimationFrames: Phaser.Animation.generateFrameNames("Coins-", 1, 7, '', 0),
-		            spriteAnimationFrameRate: 14,
-		            animation: effect,
-		            textOptions: {
-		                fontSize: 32,
-		                fill: "#ff18aa",
-		                stroke: "#ffffff",
-		                strokeThickness: 1,
-		                wordWrap: true,
-		                wordWrapWidth: 200,
-		                font: "Luckiest Guy"
-		            },
-		            // spriteAnchor: 0.5,
-		            // rotation: 15,
-		            hasBackground: bg,
-		            backgroundColor: bgColor,
-		            x: this.monster.x + this.monster.width / 2,
-		            y: this.monster.y - 20,
-		            timeToLive: timeToLive
-		        })
-		        // 血条减少
-				if(this.monsterLife.cropRect.width>0){
-					this.monsterLife.cropRect.width -= 0.5;
-				}
-
-            }
-            // console.log("playx",this._player.position.x);
-            // console.log("playy",this._player.position.y);
+            // if(speed.x==0){
+            // 	this._playerFirstPosition=this._player.position.x;
+            // }
+            // this._player.position.x=speed.x+this._playerFirstPosition;
+            // this._player.position.y+=2.2;
+            // // 坐标限制让它不要超出屏幕
+            // if(this._player.position.x<0){
+            // 	this._player.position.x=0;
+            // }
+            // if(this._player.position.x>534){
+            // 	this._player.position.x=534;
+            // }
+            // if(this._player.position.y>760){
+            // 	this._player.position.y=760;
+            // }
+            // // 限制角色跳的高度
+            // if(this._player.position.y<230){
+            // 	this._player.position.y=230;
+            // }
        //**********
        //增加player高度
        //**********
        if(speed.tap==1){
        		// speed.tap=0;
-       		this._player.position.y-=3.9;
+       		// this._player.position.y-=3.9;
        		this.angle.max+=0.02;
        		//圆圈增加
-			// this.add.tween(this.angle).to( { max: 360 }, 6000, "Linear", true, 0, -1, false);
-
-			console.log(this.angle.min);
 			this.circle.clear();
 		    this.circle.lineStyle(10, 0xfcbf1f);
-		    // this.circle.beginFill(0xa000f3);
-		    this.circle.arc(this.game.width / 2, this.game.height / 1.5, 55, this.angle.min, this.angle.max, false, 128);
-
-			// console.log(this.angle.max);
+		    this.circle.arc(0, 0, 55, this.angle.min, this.angle.max, false, 128);
 		    this.circle.endFill();
        }
        // 圆圈自减
@@ -290,9 +238,9 @@ Candy.Game.prototype = {
 			this.circle.clear();
 		    this.circle.lineStyle(10, 0xfcbf1f);
 		    if(this.angle.max>1.6){
-		    this.circle.arc(this.game.width / 2, this.game.height / 1.5, 55, this.angle.min, this.angle.max, false,128);
+		    this.circle.arc(0, 0,55, this.angle.min, this.angle.max, false,128);
 		    }
-			console.log('out',this.angle.max);
+			// console.log('out',this.angle.max);
 		    this.circle.endFill();
        }
        
@@ -311,8 +259,8 @@ Candy.Game.prototype = {
 		this._candyGroup.forEach(function(candy){
 			// to rotate them accordingly
 			candy.angle += candy.rotateMe;
-			//随机蛋糕左右
-			if(candy.position.x<(that._player.position.x+that._player.width)&&candy.position.x>(that._player.position.x)&&candy.position.y>(that._player.position.y)&&candy.position.y<(that._player.position.y+that._player.height)){
+			//吃掉下来的蛋糕，死了的蛋糕玩家不能吃
+			if(candy.position.x<(that._player.position.x+that._player.width)&&candy.position.x>(that._player.position.x)&&candy.position.y>(that._player.position.y)&&candy.position.y<(that._player.position.y+that._player.height)&&candy.alive){
 					that._candyGroup.removeChild(candy);
 					Candy._score += 1;
 	  			    Candy._scoreText.setText(Candy._score);
@@ -374,7 +322,13 @@ Candy.Game.prototype = {
         this.monsterLife.updateCrop();
 		// 吃蛋糕
   		this.physics.arcade.overlap(this._player, this._candyGroup, this.collectStar);
-  		
+		// 按钮拖动跟随一起运动
+		this.canpush.position.x = this.nopush.position.x;
+		this.canpush.position.y = this.nopush.position.y;
+		this.circleBg.position.x = this.nopush.position.x + 50;
+		this.circleBg.position.y = this.nopush.position.y + 50;
+		this.circle.position.x = this.nopush.position.x + 50;
+		this.circle.position.y = this.nopush.position.y + 50;
 	},
 
 };
@@ -400,8 +354,10 @@ Candy.item = {
 		candy.body.bounce.x = 1;
 		// enable candy to be clicked/tapped
 		candy.inputEnabled = true;
+		//设置candy alive为true
+		candy.alive = true;
 		// add event listener to click/tap
-		// candy.events.onInputDown.add(this.clickCandy, this);
+		candy.events.onInputDown.add(this.clickCandy, this);
 		// be sure that the candy will fire an event when it goes out of the screen
 		candy.checkWorldBounds = true;
 		// reset candy when it goes out of screen
@@ -413,7 +369,7 @@ Candy.item = {
 		// add candy to the group
 		game._candyGroup.add(candy);
 	},
-	clickCandy: function(monster,candy){
+	clickCandy: function(candy){
 		// kill the candy when it's clicked
 		candy.kill();
 		// add points to the score
@@ -428,12 +384,3 @@ Candy.item = {
 		Candy._health -= 10;
 	}
 };
-// 拖动模块
-Candy.drag={
-	moveDrag: function(game){
-		var drag = game.add.sprite(280, 900, 'drag');
-		drag.inputEnabled = true;
-		drag.input.enableDrag();
-		// drag.input.allowVerticallyDrag = false;
-	}
-}
