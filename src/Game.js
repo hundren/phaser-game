@@ -21,10 +21,13 @@ Candy.Game = function(game){
 	this.nopush = null;
 	this.canpush = null;
 	//中心蓄力圆圈
-	this.circle = null;
-	this.angle = { min: 1.6, max: 1.6 };
+	Candy.circle = null;
+	Candy.angle = { min: 1.6, max: 1.6 };
 	// 背景圆
-	this.circleBg = null;
+	Candy.circleBg = null;
+	// 背景圆半径
+	Candy.outside = 58;
+	Candy.setBig = true;
 	// define Candy variables to reuse them in Candy.item functions
 	Candy._scoreText = null;
 	Candy._score = 0;
@@ -97,32 +100,43 @@ Candy.Game.prototype = {
 		this.drag.inputEnabled = true;
 		this.drag.input.enableDrag();
 		//加入蓄力圆圈
-		this.circleBg = this.game.add.graphics(0,0);
-		this.circleBg.clear();
-		this.circleBg.lineStyle(20, 0x0b1638);
-		this.circleBg.arc(0, 0, 56, 0, 7, false, 128);
-		this.circleBg.endFill();
-		this.circle = this.game.add.graphics(0, 0);
+		Candy.circleBg = this.game.add.graphics(0,0);
+		Candy.circleBg.clear();
+		Candy.circleBg.lineStyle(20, 0x0b1638);
+		Candy.circleBg.arc(0, 0, 56, 0, 7, false, 128);
+		Candy.circleBg.endFill();
+		Candy.circle = this.game.add.graphics(0, 0);
 		// this.circleBg.enableDrag();
 		//加入美少女按钮
-		this.nopush = this.add.sprite((this.game.width / 2)-50, this.game.height / 1.5-50, 'cannotpush');
-		this.canpush = this.add.sprite((this.game.width / 2)-50, this.game.height / 1.5-50, 'canpush');
+		this.canpush = this.add.sprite((this.game.width / 2), this.game.height / 1.5, 'canpush');
+		this.canpush.anchor.set(0.5);
+		this.canpush.smoothed = false;
+		this.canpush.inputEnabled = true;
+		this.canpush.events.onInputDown.add(function() {
+			console.log('dd');
+			this.resetPower();
+		},this)
+		this.add.tween(this.canpush.scale).to( { x: 1.5, y: 1.5 }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, true);
 		this.canpush.visible = false;
+		this.nopush = this.add.sprite((this.game.width / 2)-50, this.game.height / 1.5-50, 'cannotpush');
 		this.nopush.inputEnabled = true;
 		this.nopush.input.enableDrag();
+		this.game.physics.enable(this.nopush, Phaser.Physics.ARCADE);
+		this.nopush.body.allowGravity = false;
+		this.nopush.body.immovable = true;
 		//加入怪兽血条
 		this.monsterLife=this.add.sprite(0, 0, 'monsterLife');
 		this.monsterLife.health=100;
 		this.monsterLife.crop(new Phaser.Rectangle(0, 0, 100, 10));
 		this.monsterLife.x = this.game.width / 2;
-    	this.monsterLife.y = this.monsterLife.height+90;
+    	this.monsterLife.y = this.monsterLife.height + 90;
 		// 加入硬币
 		this.coins = this.add.sprite(0,0,"coins","Coins-1");
 	    this.coins.anchor.setTo(0.5);
 	    this.coins.animations.add('idle', Phaser.Animation.generateFrameNames("Coins-", 1, 7, '', 0), 14, true, true);
 	    this.coins.visible = false;
 	    // 加入怪兽吸引光线
-	    this.light=this.add.sprite(100,250,"light")
+	    this.light = this.add.sprite(100,250,"light")
 	    this.light.scale.setTo(2.6);
 	    this.light.visible = false;
 		// 加入怪兽
@@ -195,6 +209,27 @@ Candy.Game.prototype = {
 			this.game.paused = false;
 		}, this);
 	},
+	resetPower: function(){
+		this.canpush.visible = false;
+		this.nopush.visible = true;
+		Candy.circleBg.visible = true;
+		this.nopush.visible = true;
+		Candy.angle.max = 1.6;
+		Candy.circle.lineStyle(10, 0xfcbf1f);
+		Candy.circle.clear();
+		Candy.circle.arc(0, 0,55, 1.6, 1.6, false,128);
+		Candy.circle.endFill();
+		var that = this;
+		console.log('groupLength',this._candyGroup)
+		this._candyGroup.forEach(function(candy){
+			candy.kill();
+			// add points to the score
+			Candy._score += 1;
+			// update score text
+		})
+		Candy._scoreText.setText(Candy._score);
+		
+	},
 	update: function(){
             var speed = this.game.touchControl.speed;
             //打击计数器
@@ -225,29 +260,54 @@ Candy.Game.prototype = {
        if(speed.tap==1){
        		// speed.tap=0;
        		// this._player.position.y-=3.9;
-       		this.angle.max+=0.02;
-       		//圆圈增加
-			this.circle.clear();
-		    this.circle.lineStyle(10, 0xfcbf1f);
-		    this.circle.arc(0, 0, 55, this.angle.min, this.angle.max, false, 128);
-		    this.circle.endFill();
        }
-       // 圆圈自减
-       if(this.angle.max>1.6){
-       		this.angle.max-=0.01;
-			this.circle.clear();
-		    this.circle.lineStyle(10, 0xfcbf1f);
-		    if(this.angle.max>1.6){
-		    this.circle.arc(0, 0,55, this.angle.min, this.angle.max, false,128);
+	   // 圆圈自减
+	//    Candy.angle.max = 8;
+       if(Candy.angle.max>1.6 && Candy.angle.max<8){
+			Candy.circleBg.visible = true;
+       		Candy.angle.max-=0.005;
+			Candy.circle.clear();
+		    Candy.circle.lineStyle(10, 0xfcbf1f);
+		    if(Candy.angle.max>1.6){
+		    Candy.circle.arc(0, 0,55, Candy.angle.min, Candy.angle.max, false,128);
 		    }
-			// console.log('out',this.angle.max);
-		    this.circle.endFill();
-       }
+			// console.log('out',Candy.angle.max);
+			Candy.circle.endFill();
+			
+	   }
+	// 圆圈满了高亮
+	   else if(Candy.angle.max >= 8){
+		this.canpush.visible = true;
+		this.nopush.visible = false;
+		Candy.circleBg.visible = false;
+		function setBigger(outbig){
+			Candy.circle.clear();
+			Candy.circle.lineStyle(10, 0xffffff,0.4);
+			Candy.circle.arc(0, 0, outbig, 0, 7, false, 128);
+			Candy.circle.endFill();	
+		}
+		if(Candy.setBig){
+			if(Candy.outside>=58 && Candy.outside<117){
+	 			Candy.outside += 0.5;
+			}else if(Candy.outside>=117){
+				Candy.outside -= 0.5;
+				Candy.setBig = false;
+			}
+		}else{
+			if(Candy.outside>58 && Candy.outside<117){
+				Candy.outside -= 0.5;
+		   }else if(Candy.outside<=58){
+			   Candy.outside += 0.5;
+			   Candy.setBig = true;
+		   }
+		}
+		setBigger(Candy.outside);
+	   }
        
 		// update timer every frame
 		this._spawnCandyTimer += this.time.elapsed;
 		// if spawn timer reach one second (1000 miliseconds)
-		if(this._spawnCandyTimer > 1500) {	
+		if(this._spawnCandyTimer > 1000) {	
 			// reset it
 			this._spawnCandyTimer = 0;
 			// and spawn new candy
@@ -256,18 +316,20 @@ Candy.Game.prototype = {
 		// loop through all candy on the screen
 		// 吃了蛋糕
 		var that=this;
+		// console.log(this._candyGroup)
 		this._candyGroup.forEach(function(candy){
 			// to rotate them accordingly
 			candy.angle += candy.rotateMe;
 			//吃掉下来的蛋糕，死了的蛋糕玩家不能吃
 			if(candy.position.x<(that._player.position.x+that._player.width)&&candy.position.x>(that._player.position.x)&&candy.position.y>(that._player.position.y)&&candy.position.y<(that._player.position.y+that._player.height)&&candy.alive){
 					that._candyGroup.removeChild(candy);
-					Candy._score += 1;
-	  			    Candy._scoreText.setText(Candy._score);
+					// Candy._score += 1;
+					// Candy._scoreText.setText(Candy._score);
 			}
 			// 死了的蛋糕就给怪物吃
 			if(!candy.alive){
-				if(candy.position.x<(that.monster.position.x+that.monster.width)&&candy.position.x>that.monster.position.x&&candy.position.y>that.monster.position.y&&candy.position.y<(that.monster.position.y+that.monster.height)){
+				if(candy.position.x<(that.monster.position.x+that.monster.width)&&
+				candy.position.x>that.monster.position.x&&candy.position.y>that.monster.position.y&&candy.position.y<(that.monster.position.y+that.monster.height)){
 					that._candyGroup.removeChild(candy);
 					if(that.monsterLife.cropRect.width+30<100){
 						that.monsterLife.cropRect.width+=30;
@@ -278,10 +340,11 @@ Candy.Game.prototype = {
 					that._candyGroup.removeChild(candy);
 				}
 			}
-		});
-		//互相物理碰撞开关
-		// this.game.physics.arcade.collide(this._candyGroup);
 		
+		});	
+		//互相物理碰撞开关
+		this.game.physics.arcade.collide(this.nopush,this._candyGroup);
+	
 		this.monsterLife.x=this.monster.x+23;
 		this.light.x=this.monster.x-90;
 		var lightRan=Math.floor(Math.random()*200);
@@ -323,12 +386,12 @@ Candy.Game.prototype = {
 		// 吃蛋糕
   		this.physics.arcade.overlap(this._player, this._candyGroup, this.collectStar);
 		// 按钮拖动跟随一起运动
-		this.canpush.position.x = this.nopush.position.x;
-		this.canpush.position.y = this.nopush.position.y;
-		this.circleBg.position.x = this.nopush.position.x + 50;
-		this.circleBg.position.y = this.nopush.position.y + 50;
-		this.circle.position.x = this.nopush.position.x + 50;
-		this.circle.position.y = this.nopush.position.y + 50;
+		this.canpush.position.x = this.nopush.position.x + 50;
+		this.canpush.position.y = this.nopush.position.y + 50;
+		Candy.circleBg.position.x = this.nopush.position.x + 50;
+		Candy.circleBg.position.y = this.nopush.position.y + 50;
+		Candy.circle.position.x = this.nopush.position.x + 50;
+		Candy.circle.position.y = this.nopush.position.y + 50;
 	},
 
 };
@@ -350,8 +413,10 @@ Candy.item = {
 		// enable candy body for physic engine
 		game.physics.enable(candy, Phaser.Physics.ARCADE);
 		candy.body.collideWorldBounds = true;
+		candy.body.velocity.x = 10 + Math.random() * 40;
 		candy.body.bounce.y = 0.8;
 		candy.body.bounce.x = 1;
+		// candy.body.bounce.setTo(0.8);
 		// enable candy to be clicked/tapped
 		candy.inputEnabled = true;
 		//设置candy alive为true
@@ -376,6 +441,15 @@ Candy.item = {
 		Candy._score += 1;
 		// update score text
 		Candy._scoreText.setText(Candy._score);
+		// 点中一个蛋糕加一个能量
+		//圆圈增加
+		if(Candy.angle.max <= 8 ){
+			Candy.angle.max+=0.5;
+			Candy.circle.clear();
+			Candy.circle.lineStyle(10, 0xfcbf1f);
+			Candy.circle.arc(0, 0, 55, Candy.angle.min, Candy.angle.max, false, 128);
+			Candy.circle.endFill();
+		}
 	},
 	removeCandy: function(candy){
 		// kill the candy
