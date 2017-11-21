@@ -19,6 +19,7 @@ Candy.Preloader.prototype = {
 		this.load.image('button-pause', 'img/button-pause.png');
 		this.load.image('drag', 'img/tuo.png');
 		this.load.image('monsterLife', 'img/greenLife.png');
+		this.load.image('monsterLifeBg', 'img/greenLifeBg.png');
 		this.load.image('light', 'img/comeLight.png');
 		// 美少女点击按钮
 		this.load.image('canpush', 'img/wa.png');
@@ -27,6 +28,7 @@ Candy.Preloader.prototype = {
 		// load spritesheets
 		this.load.spritesheet('candy', 'img/candy.png', 82, 98);
 		this.load.spritesheet('monster-idle', 'img/monster-idle.png', 103, 131);
+		this.load.spritesheet('salior', 'img/salior.png', 32, 48);
 		this.load.spritesheet('button-start', 'img/button-start.png', 401, 143);
   		this.load.atlasJSONHash("player1", "img/char.png", "img/char.json");
     	this.load.atlasJSONHash("coins", "img/coins.png", "img/coins.json");

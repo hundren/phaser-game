@@ -5,6 +5,7 @@ var reg = {};
 Candy.Game = function(game){
 	// define needed variables for Candy.Game
 	this._player = null;
+	this._playerDirection = "right";
 	this._candyGroup = null;
 	this._spawnCandyTimer = 0;
 	this._fontStyle = null;
@@ -71,17 +72,15 @@ Candy.Game.prototype = {
 		// add pause button
 		this.add.button(Candy.GAME_WIDTH-96-10, 5, 'button-pause', this.managePause, this);
 		// create the player
-		this._player = this.add.sprite(280, 760, 'monster-idle');
+		this._player = this.add.sprite(280, 760, 'salior');
+		this._player.scale.set(3);
 		//player加入物理引擎
-		// this.game.physics.enable(this._player, Phaser.Physics.ARCADE);
-		// this._player.body.collideWorldBounds = true;
-		// this._player.body.bounce.y = 0.8;
-		// this._player.body.bounce.x = 1;
-		// this._player.body.gravity.y = 50;
 		// add player animation
-		this._player.animations.add('idle', [0,1,2,3,4,5,6,7,8,9,10,11,12], 10, true);
+		// this._player.animations.add('walkLeft', [0,1,2,3,4,5,6,7,8,9,10,11,12], 10, true);
+		this._player.animations.add('walkLeft', [0,1,2,3], 5 /*fps */, true);
+		this._player.animations.add('walkRight',[4,5,6,7], 5 /*fps */, true);
 		// play the animation
-		this._player.animations.play('idle');
+		// this._player.animations.play('walkLeft');
 		// set font style
 		this._fontStyle = { font: "40px Arial", fill: "#FFCC00", stroke: "#333", strokeThickness: 5, align: "center" };
 		// initialize the spawn timer
@@ -126,10 +125,11 @@ Candy.Game.prototype = {
 		this.nopush.body.immovable = true;
 		//加入怪兽血条
 		this.monsterLife=this.add.sprite(0, 0, 'monsterLife');
+		this.monsterLifeBg=this.add.sprite(0, 0, 'monsterLifeBg');
 		this.monsterLife.health=100;
-		this.monsterLife.crop(new Phaser.Rectangle(0, 0, 100, 10));
+		this.monsterLife.crop(new Phaser.Rectangle(0, 0,100, 10));
 		this.monsterLife.x = this.game.width / 2;
-    	this.monsterLife.y = this.monsterLife.height + 90;
+		this.monsterLifeBg.y = this.monsterLife.y = this.monsterLife.height + 90;
 		// 加入硬币
 		this.coins = this.add.sprite(0,0,"coins","Coins-1");
 	    this.coins.anchor.setTo(0.5);
@@ -253,7 +253,23 @@ Candy.Game.prototype = {
             // // 限制角色跳的高度
             // if(this._player.position.y<230){
             // 	this._player.position.y=230;
-            // }
+			// }
+			// 玩家随机运动
+            // 	this._player.position.x=534;
+			
+			if(this._playerDirection=='right'){
+				this._player.play('walkRight');
+				this._player.x+=0.9;
+				if(this._player.x>(this.game.width-this._player.width)){
+					this._playerDirection='left';
+				}
+			}else{
+				this._player.play('walkLeft');
+				this._player.x-=0.9;
+				if(this._player.x<0){
+					this._playerDirection='right';
+				}
+			}
        //**********
        //增加player高度
        //**********
@@ -315,14 +331,15 @@ Candy.Game.prototype = {
 		}
 		// loop through all candy on the screen
 		// 吃了蛋糕
-		var that=this;
+		var that = this;
 		// console.log(this._candyGroup)
 		this._candyGroup.forEach(function(candy){
 			// to rotate them accordingly
 			candy.angle += candy.rotateMe;
 			//吃掉下来的蛋糕，死了的蛋糕玩家不能吃
 			if(candy.position.x<(that._player.position.x+that._player.width)&&candy.position.x>(that._player.position.x)&&candy.position.y>(that._player.position.y)&&candy.position.y<(that._player.position.y+that._player.height)&&candy.alive){
-					that._candyGroup.removeChild(candy);
+					// that._candyGroup.removeChild(candy);
+					candy.kill();
 					// Candy._score += 1;
 					// Candy._scoreText.setText(Candy._score);
 			}
@@ -330,14 +347,16 @@ Candy.Game.prototype = {
 			if(!candy.alive){
 				if(candy.position.x<(that.monster.position.x+that.monster.width)&&
 				candy.position.x>that.monster.position.x&&candy.position.y>that.monster.position.y&&candy.position.y<(that.monster.position.y+that.monster.height)){
-					that._candyGroup.removeChild(candy);
+					// that._candyGroup.removeChild(candy);
+					candy.kill();
 					if(that.monsterLife.cropRect.width+30<100){
 						that.monsterLife.cropRect.width+=30;
 					}else{
 						that.monsterLife.cropRect.width=100;
 					}
 				}else if(candy.position.y<candy.height-40){
-					that._candyGroup.removeChild(candy);
+					// that._candyGroup.removeChild(candy);
+					candy.kill();
 				}
 			}
 		
@@ -346,6 +365,7 @@ Candy.Game.prototype = {
 		this.game.physics.arcade.collide(this.nopush,this._candyGroup);
 	
 		this.monsterLife.x=this.monster.x+23;
+		this.monsterLifeBg.x=this.monsterLife.x;
 		this.light.x=this.monster.x-90;
 		var lightRan=Math.floor(Math.random()*200);
 		// var lightRan=25;
