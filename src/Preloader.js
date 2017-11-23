@@ -24,6 +24,10 @@ Candy.Preloader.prototype = {
 		// 美少女点击按钮
 		this.load.image('canpush', 'img/wa.png');
 		this.load.image('cannotpush', 'img/wb.png');
+		this.load.image('cannotpush2', 'img/wb2.png');
+		this.load.image('cannotpush3', 'img/wb3.png');
+		this.load.image('cannotpush4', 'img/wb4.png');
+		
 
 		// load spritesheets
 		this.load.spritesheet('candy', 'img/candy.png', 82, 98);

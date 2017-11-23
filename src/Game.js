@@ -6,7 +6,7 @@ Candy.Game = function(game){
 	// define needed variables for Candy.Game
 	this._player = null;
 	this._playerDirection = "right";
-	this._candyGroup = null;
+	Candy._candyGroup = null;
 	this._spawnCandyTimer = 0;
 	this._fontStyle = null;
 	this._drag = null;
@@ -32,7 +32,7 @@ Candy.Game = function(game){
 	// define Candy variables to reuse them in Candy.item functions
 	Candy._scoreText = null;
 	Candy._score = 0;
-	Candy._health = 0;
+	Candy._fat = 0;
 	Candy.killTime = 0;
 	Candy._battleHowls = [
 		"PAM!",
@@ -73,7 +73,7 @@ Candy.Game.prototype = {
 		this.add.button(Candy.GAME_WIDTH-96-10, 5, 'button-pause', this.managePause, this);
 		// create the player
 		this._player = this.add.sprite(280, 760, 'salior');
-		this._player.scale.set(3);
+		this._player.scale.set(2,3);
 		//player加入物理引擎
 		// add player animation
 		// this._player.animations.add('walkLeft', [0,1,2,3,4,5,6,7,8,9,10,11,12], 10, true);
@@ -88,9 +88,9 @@ Candy.Game.prototype = {
 		// initialize the score text with 0
 		Candy._scoreText = this.add.text(120, 20, "0", this._fontStyle);
 		// set health of the player
-		Candy._health = 10;
+		Candy._fat = 0;
 		// create new group for candy
-		this._candyGroup = this.add.group();
+		Candy._candyGroup = this.add.group();
 		// spawn first candy
 		Candy.item.spawnCandy(this);
 		// 插入拖动模块
@@ -117,12 +117,7 @@ Candy.Game.prototype = {
 		},this)
 		this.add.tween(this.canpush.scale).to( { x: 1.5, y: 1.5 }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, true);
 		this.canpush.visible = false;
-		this.nopush = this.add.sprite((this.game.width / 2)-50, this.game.height / 1.5-50, 'cannotpush');
-		this.nopush.inputEnabled = true;
-		this.nopush.input.enableDrag();
-		this.game.physics.enable(this.nopush, Phaser.Physics.ARCADE);
-		this.nopush.body.allowGravity = false;
-		this.nopush.body.immovable = true;
+		this.addNoPush('cannotpush');
 		//加入怪兽血条
 		this.monsterLife=this.add.sprite(0, 0, 'monsterLife');
 		this.monsterLifeBg=this.add.sprite(0, 0, 'monsterLifeBg');
@@ -196,6 +191,19 @@ Candy.Game.prototype = {
 			}
 	    }, this);
 	},
+	addNoPush:function(img){
+		var x = this.game.width / 2-50;
+		var y = this.game.height / 1.5-50;
+		this.nopush && (x = this.nopush.position.x);
+		this.nopush && (y = this.nopush.position.y);
+		this.nopush && this.nopush.kill();
+		this.nopush = this.add.sprite(x, y, img);
+		this.nopush.inputEnabled = true;
+		this.nopush.input.enableDrag();
+		this.game.physics.enable(this.nopush, Phaser.Physics.ARCADE);
+		this.nopush.body.allowGravity = false;
+		this.nopush.body.immovable = true;
+	},
 	managePause: function(){
 		// pause the game
 		this.game.paused = true;
@@ -220,13 +228,13 @@ Candy.Game.prototype = {
 		Candy.circle.arc(0, 0,55, 1.6, 1.6, false,128);
 		Candy.circle.endFill();
 		var that = this;
-		console.log('groupLength',this._candyGroup)
-		this._candyGroup.forEach(function(candy){
-			candy.kill();
+		console.log('groupLength',Candy._candyGroup)
+		Candy._candyGroup.forEach(function(candy){
 			// add points to the score
 			Candy._score += 1;
 			// update score text
 		})
+		Candy._candyGroup.removeAll()
 		Candy._scoreText.setText(Candy._score);
 		
 	},
@@ -234,29 +242,14 @@ Candy.Game.prototype = {
             var speed = this.game.touchControl.speed;
             //打击计数器
             this.hitCount+=1;
-            // console.log("xx",speed.tap);
-            // if(speed.x==0){
-            // 	this._playerFirstPosition=this._player.position.x;
-            // }
-            // this._player.position.x=speed.x+this._playerFirstPosition;
-            // this._player.position.y+=2.2;
-            // // 坐标限制让它不要超出屏幕
-            // if(this._player.position.x<0){
-            // 	this._player.position.x=0;
-            // }
-            // if(this._player.position.x>534){
-            // 	this._player.position.x=534;
-            // }
-            // if(this._player.position.y>760){
-            // 	this._player.position.y=760;
-            // }
-            // // 限制角色跳的高度
-            // if(this._player.position.y<230){
-            // 	this._player.position.y=230;
-			// }
 			// 玩家随机运动
-            // 	this._player.position.x=534;
-			
+			var playerGo = Math.floor(Math.random()*240);
+			if(playerGo == 25){
+				this._playerDirection='right';
+			}
+			if(playerGo == 123){
+				this._playerDirection='left';
+			}
 			if(this._playerDirection=='right'){
 				this._player.play('walkRight');
 				this._player.x+=0.9;
@@ -333,36 +326,48 @@ Candy.Game.prototype = {
 		// 吃了蛋糕
 		var that = this;
 		// console.log(this._candyGroup)
-		this._candyGroup.forEach(function(candy){
+		Candy._candyGroup.forEach(function(candy){
 			// to rotate them accordingly
 			candy.angle += candy.rotateMe;
 			//吃掉下来的蛋糕，死了的蛋糕玩家不能吃
 			if(candy.position.x<(that._player.position.x+that._player.width)&&candy.position.x>(that._player.position.x)&&candy.position.y>(that._player.position.y)&&candy.position.y<(that._player.position.y+that._player.height)&&candy.alive){
-					// that._candyGroup.removeChild(candy);
-					candy.kill();
-					// Candy._score += 1;
-					// Candy._scoreText.setText(Candy._score);
+				Candy._candyGroup.removeChild(candy);
+					// candy.kill();
+					Candy._fat += 1;
+					// console.log(Candy._fat);
+					that._player.scale.set(2+(Candy._fat)/10,3);
+					 if(Candy._fat >= 2 && Candy._fat < 5){
+						that.addNoPush('cannotpush2');
+					}else if(Candy._fat >= 5 && Candy._fat < 8){
+						that.addNoPush('cannotpush3');
+					}else if(Candy._fat >= 8 && Candy._fat < 11){
+						that.addNoPush('cannotpush4');
+					}else if(Candy._fat > 11){
+						console.log('ddd')
+					that._player.scale.set(5,3);
+					
+					}
 			}
 			// 死了的蛋糕就给怪物吃
 			if(!candy.alive){
 				if(candy.position.x<(that.monster.position.x+that.monster.width)&&
 				candy.position.x>that.monster.position.x&&candy.position.y>that.monster.position.y&&candy.position.y<(that.monster.position.y+that.monster.height)){
-					// that._candyGroup.removeChild(candy);
-					candy.kill();
+					Candy._candyGroup.removeChild(candy);
+					// candy.kill();
 					if(that.monsterLife.cropRect.width+30<100){
 						that.monsterLife.cropRect.width+=30;
 					}else{
 						that.monsterLife.cropRect.width=100;
 					}
 				}else if(candy.position.y<candy.height-40){
-					// that._candyGroup.removeChild(candy);
-					candy.kill();
+					Candy._candyGroup.removeChild(candy);
+					// candy.kill();
 				}
 			}
 		
 		});	
 		//互相物理碰撞开关
-		this.game.physics.arcade.collide(this.nopush,this._candyGroup);
+		this.game.physics.arcade.collide(this.nopush,Candy._candyGroup);
 	
 		this.monsterLife.x=this.monster.x+23;
 		this.monsterLifeBg.x=this.monsterLife.x;
@@ -376,7 +381,7 @@ Candy.Game.prototype = {
 				that.showLight=true;
 			},2000);
 			//吸起不弹起来的蛋糕
-		this._candyGroup.forEach(function(candy){
+			Candy._candyGroup.forEach(function(candy){
 			// console.log('candyheight',candy.height,'candyy',candy.position.y,'gameheight',that.game.height);
 			if(candy.position.y>(that.game.height-candy.height)&&(candy.position.x>that.monster.x&&candy.position.x<that.monster.x+180)){
 				// candy.position.y-=20;
@@ -404,7 +409,7 @@ Candy.Game.prototype = {
 		}
         this.monsterLife.updateCrop();
 		// 吃蛋糕
-  		this.physics.arcade.overlap(this._player, this._candyGroup, this.collectStar);
+  		this.physics.arcade.overlap(this._player, Candy._candyGroup, this.collectStar);
 		// 按钮拖动跟随一起运动
 		this.canpush.position.x = this.nopush.position.x + 50;
 		this.canpush.position.y = this.nopush.position.y + 50;
@@ -452,11 +457,13 @@ Candy.item = {
 		// set the random rotation value
 		candy.rotateMe = (Math.random()*4)-2;
 		// add candy to the group
-		game._candyGroup.add(candy);
+		Candy._candyGroup.add(candy);
 	},
 	clickCandy: function(candy){
 		// kill the candy when it's clicked
-		candy.kill();
+		Candy._candyGroup.removeChild(candy);
+		
+		// candy.kill();
 		// add points to the score
 		Candy._score += 1;
 		// update score text
@@ -473,8 +480,10 @@ Candy.item = {
 	},
 	removeCandy: function(candy){
 		// kill the candy
-		candy.kill();
+		Candy.game._candyGroup.removeChild(candy);
+		
+		// candy.kill();
 		// decrease player's health
-		Candy._health -= 10;
+		// Candy._health -= 10;
 	}
 };
