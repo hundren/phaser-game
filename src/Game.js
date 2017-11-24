@@ -12,6 +12,7 @@ Candy.Game = function(game){
 	this._drag = null;
 	this.monster = null;
 	this.monsterLife = null;
+	this.saliorLife = null;
 	this.hitCount = 0;
 	this.coins = null;
 	this.light = null;
@@ -69,6 +70,10 @@ Candy.Game.prototype = {
 		this.add.sprite(0, 0, 'background');
 		this.add.sprite(-30, Candy.GAME_HEIGHT-160, 'floor');
 		this.add.sprite(10, 5, 'score-bg');
+		// 加入美少女吃蛋糕饱肚血条
+		this.saliorLife=this.add.sprite(230,23, 'saliorLife',24);
+		this.saliorLife.animations.add('eatFat', [24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0], 10 /*fps */, false);
+		
 		// add pause button
 		this.add.button(Candy.GAME_WIDTH-96-10, 5, 'button-pause', this.managePause, this);
 		// create the player
@@ -93,11 +98,10 @@ Candy.Game.prototype = {
 		Candy._candyGroup = this.add.group();
 		// spawn first candy
 		Candy.item.spawnCandy(this);
-		// 插入拖动模块
-		// Candy.drag.moveDrag(this);
-		this.drag = this.add.sprite(280, 400, 'drag');
-		this.drag.inputEnabled = true;
-		this.drag.input.enableDrag();
+		 // 加入怪兽吸引光线
+		 this.light = this.add.sprite(100,250,"light")
+		 this.light.scale.setTo(2.6);
+		 this.light.visible = false;
 		//加入蓄力圆圈
 		Candy.circleBg = this.game.add.graphics(0,0);
 		Candy.circleBg.clear();
@@ -125,15 +129,14 @@ Candy.Game.prototype = {
 		this.monsterLife.crop(new Phaser.Rectangle(0, 0,100, 10));
 		this.monsterLife.x = this.game.width / 2;
 		this.monsterLifeBg.y = this.monsterLife.y = this.monsterLife.height + 90;
+	
+		
 		// 加入硬币
 		this.coins = this.add.sprite(0,0,"coins","Coins-1");
 	    this.coins.anchor.setTo(0.5);
 	    this.coins.animations.add('idle', Phaser.Animation.generateFrameNames("Coins-", 1, 7, '', 0), 14, true, true);
 	    this.coins.visible = false;
-	    // 加入怪兽吸引光线
-	    this.light = this.add.sprite(100,250,"light")
-	    this.light.scale.setTo(2.6);
-	    this.light.visible = false;
+	   
 		// 加入怪兽
     	this.monster = this.add.sprite(0, 0, "player1", "SlimeMonster01");
     	this.monster.scale.setTo(0.6, 0.6);
@@ -334,18 +337,18 @@ Candy.Game.prototype = {
 				Candy._candyGroup.removeChild(candy);
 					// candy.kill();
 					Candy._fat += 1;
-					// console.log(Candy._fat);
+					that.saliorLife.animations.next();
 					that._player.scale.set(2+(Candy._fat)/10,3);
-					 if(Candy._fat >= 2 && Candy._fat < 5){
+					 if(Candy._fat >= 5 && Candy._fat < 10){
 						that.addNoPush('cannotpush2');
-					}else if(Candy._fat >= 5 && Candy._fat < 8){
+					}else if(Candy._fat >= 10 && Candy._fat < 15){
 						that.addNoPush('cannotpush3');
-					}else if(Candy._fat >= 8 && Candy._fat < 11){
+					}else if(Candy._fat >= 15 && Candy._fat < 20){
 						that.addNoPush('cannotpush4');
-					}else if(Candy._fat > 11){
+					}else if(Candy._fat > 24){
 						console.log('ddd')
 					that._player.scale.set(5,3);
-					
+					that.state.start('GameOver');
 					}
 			}
 			// 死了的蛋糕就给怪物吃
@@ -366,6 +369,7 @@ Candy.Game.prototype = {
 			}
 		
 		});	
+		
 		//互相物理碰撞开关
 		this.game.physics.arcade.collide(this.nopush,Candy._candyGroup);
 	
