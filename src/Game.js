@@ -32,7 +32,7 @@ Candy.Game = function(game){
 	Candy.setBig = true;
 	// define Candy variables to reuse them in Candy.item functions
 	Candy._scoreText = null;
-	Candy._score = 0;
+	Candy._score = 60;
 	Candy._fat = 0;
 	Candy.killTime = 0;
 	Candy._battleHowls = [
@@ -91,7 +91,7 @@ Candy.Game.prototype = {
 		// initialize the spawn timer
 		this._spawnCandyTimer = 0;
 		// initialize the score text with 0
-		Candy._scoreText = this.add.text(120, 20, "0", this._fontStyle);
+		Candy._scoreText = this.add.text(120, 20, Candy._score, this._fontStyle);
 		// set health of the player
 		Candy._fat = 0;
 		// create new group for candy
@@ -234,7 +234,7 @@ Candy.Game.prototype = {
 		console.log('groupLength',Candy._candyGroup)
 		Candy._candyGroup.forEach(function(candy){
 			// add points to the score
-			Candy._score += 1;
+			Candy._score += 5;
 			// update score text
 		})
 		Candy._candyGroup.removeAll()
@@ -324,6 +324,13 @@ Candy.Game.prototype = {
 			this._spawnCandyTimer = 0;
 			// and spawn new candy
 			Candy.item.spawnCandy(this);
+			// 倒计时开始
+			Candy._score -= 1;
+			if(Candy._score <= 0){
+				that.state.start('GameOver');
+				Candy._score = 60;
+			}
+			Candy._scoreText.setText(Candy._score);
 		}
 		// loop through all candy on the screen
 		// 吃了蛋糕
@@ -346,9 +353,9 @@ Candy.Game.prototype = {
 					}else if(Candy._fat >= 15 && Candy._fat < 20){
 						that.addNoPush('cannotpush4');
 					}else if(Candy._fat > 24){
-						console.log('ddd')
 					that._player.scale.set(5,3);
 					that.state.start('GameOver');
+					Candy._score = 60;
 					}
 			}
 			// 死了的蛋糕就给怪物吃
@@ -469,9 +476,9 @@ Candy.item = {
 		
 		// candy.kill();
 		// add points to the score
-		Candy._score += 1;
+		// Candy._score += 1;
 		// update score text
-		Candy._scoreText.setText(Candy._score);
+		// Candy._scoreText.setText(Candy._score);
 		// 点中一个蛋糕加一个能量
 		//圆圈增加
 		if(Candy.angle.max <= 8 ){
