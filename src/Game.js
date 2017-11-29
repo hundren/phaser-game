@@ -327,7 +327,7 @@ Candy.Game.prototype = {
 			// 倒计时开始
 			Candy._score -= 1;
 			if(Candy._score <= 0){
-				that.state.start('GameOver');
+				this.state.start('GameOver');
 				Candy._score = 60;
 			}
 			Candy._scoreText.setText(Candy._score);
