@@ -3,11 +3,8 @@
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,minimal-ui"/>
-	<title>Monster Wants Candy demo</title>
+	<title>美少女吃蛋糕</title>
 	<link rel="stylesheet" type="text/css" href="css/font.css">
-	<!-- <link href='http://fonts.googleapis.com/css?family=Luckiest+Guy' rel='stylesheet' type='text/css'>
-
-  <link rel='stylesheet prefetch' href='http://fonts.googleapis.com/css?family=Luckiest+Guy'> -->
 	<style> body { margin: 0; background: #B4D9E7; } </style>
 	<script src="src/phaser.min.js"></script>
 	<script src="src/floatingText.min.js"></script>
@@ -18,8 +15,11 @@
 	<script src="src/MainMenu.js"></script>
 	<script src="src/Game.js"></script>
 	<script src="src/GameOver.js"></script>
+	<script src="src/GoodEnd.js"></script>
+	
 </head>
 <body>
+		<p id="adTitle" style="position:fixed;top:0;left:0">Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
 <script>
 (function() {
 	// initialize the framework
@@ -30,6 +30,7 @@
 	game.state.add('MainMenu', Candy.MainMenu);
 	game.state.add('Game', Candy.Game);
 	game.state.add('GameOver', Candy.GameOver);
+	game.state.add('GoodEnd', Candy.GoodEnd);
 	// start the Boot state
 	game.state.start('Boot');
 })();

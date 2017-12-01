@@ -12,5 +12,6 @@ Candy.MainMenu.prototype = {
 	startGame: function() {
 		// start the Game state
 		this.state.start('Game');
+		document.getElementById('adTitle').style.display='none'
 	}
 };
