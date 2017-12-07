@@ -56,6 +56,14 @@ Candy.Game = function(game){
 		"UGGH!",
 		"THWACK!"
 		];
+	// 音效
+	Candy.hit = null;
+ 	Candy.lancer = null;
+	Candy.clickCake = null;
+	Candy.showtime = null;
+	Candy.clock = null;
+	Candy.hurt = null;
+	Candy.showTimeTrue = true;
 };
 Candy.Game.prototype = {
 	create: function(){
@@ -76,6 +84,16 @@ Candy.Game.prototype = {
 		
 		// add pause button
 		this.add.button(Candy.GAME_WIDTH-96-10, 5, 'button-pause', this.managePause, this);
+		var audioStatus = storageAPI.get('audio');
+		audioStatus?fx.play('',0,1,true,false):fx.stop();
+		// 加入音效
+		Candy.hit = this.add.audio('hit');
+		Candy.lancer = this.add.audio('lancer');
+	    Candy.clickCake = this.add.audio('clickCake');
+	    Candy.showtime = this.add.audio('showtime');
+		Candy.clock = this.add.audio('clock');
+	    Candy.hurt = this.add.audio('hurt');
+		
 		// create the player
 		this._player = this.add.sprite(280, 760, 'salior');
 		this._player.scale.set(2,3);
@@ -146,6 +164,7 @@ Candy.Game.prototype = {
     	this.monster.animations.play("idles");
    	    this.monster.inputEnabled = true;
    	    this.monster.events.onInputDown.add(function() {
+			Candy.hit.play();
 			var dmg = this.game.rnd.integerInRange(100, 1000);
 			var timeToLive = 200;
 			var masterEffect="physics";
@@ -211,7 +230,7 @@ Candy.Game.prototype = {
 		// pause the game
 		this.game.paused = true;
 		// add proper informational text
-		var pausedText = this.add.text(100, 250, "Game paused.\nTap anywhere to continue.", this._fontStyle);
+		var pausedText = this.add.text(100, 250, "吃得太多休息一下.\n随便按某个地方继续吃", this._fontStyle);
 		// set event listener for the user's click/tap the screen
 		this.input.onDown.add(function(){
 			// remove the pause text
@@ -231,11 +250,17 @@ Candy.Game.prototype = {
 		Candy.circle.arc(0, 0,55, 1.6, 1.6, false,128);
 		Candy.circle.endFill();
 		var that = this;
-		console.log('groupLength',Candy._candyGroup)
+		console.log('groupLength',Candy._candyGroup);
+		var i = 0;
 		Candy._candyGroup.forEach(function(candy){
 			// add points to the score
-			Candy._score += 5;
+			Candy._score += 1;
 			// update score text
+			setTimeout(function(){
+				Candy.clickCake.play();
+			},200*i)
+			i++;
+			
 		})
 		Candy._candyGroup.removeAll()
 		Candy._scoreText.setText(Candy._score);
@@ -276,6 +301,7 @@ Candy.Game.prototype = {
 	   // 圆圈自减
 	//    Candy.angle.max = 8;
        if(Candy.angle.max>1.6 && Candy.angle.max<8){
+			Candy.showTimeTrue = true;
 			Candy.circleBg.visible = true;
        		Candy.angle.max-=0.005;
 			Candy.circle.clear();
@@ -289,6 +315,10 @@ Candy.Game.prototype = {
 	   }
 	// 圆圈满了高亮
 	   else if(Candy.angle.max >= 8){
+		   if(Candy.showTimeTrue){
+				Candy.showTimeTrue = false;
+				Candy.showtime.play();
+		   }
 		this.canpush.visible = true;
 		this.nopush.visible = false;
 		Candy.circleBg.visible = false;
@@ -343,6 +373,7 @@ Candy.Game.prototype = {
 			if(candy.position.x<(that._player.position.x+that._player.width)&&candy.position.x>(that._player.position.x)&&candy.position.y>(that._player.position.y)&&candy.position.y<(that._player.position.y+that._player.height)&&candy.alive){
 				Candy._candyGroup.removeChild(candy);
 					// candy.kill();
+					Candy.hurt.play();
 					Candy._fat += 1;
 					that.saliorLife.animations.next();
 					that._player.scale.set(2+(Candy._fat)/10,3);
@@ -388,6 +419,7 @@ Candy.Game.prototype = {
 		if(lightRan==25){
 			this.light.visible=true;
 			this.showLight=false;
+			Candy.lancer.play();
 			setTimeout(function(){
 				that.showLight=true;
 			},2000);
@@ -473,7 +505,7 @@ Candy.item = {
 	clickCandy: function(candy){
 		// kill the candy when it's clicked
 		Candy._candyGroup.removeChild(candy);
-		
+		Candy.clickCake.play();
 		// candy.kill();
 		// add points to the score
 		// Candy._score += 1;
