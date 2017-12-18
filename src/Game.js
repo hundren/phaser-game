@@ -356,7 +356,11 @@ Candy.Game.prototype = {
 			Candy.item.spawnCandy(this);
 			// 倒计时开始
 			Candy._score -= 1;
+			if(Candy._score > 0 && Candy._score <= 10){
+				Candy.clock.play('',0,1,true,false);
+			}
 			if(Candy._score <= 0){
+				Candy.clock.stop();
 				this.state.start('GameOver');
 				Candy._score = 60;
 			}

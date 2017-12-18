@@ -48,12 +48,13 @@ Candy.Preloader.prototype = {
 		
 		// 音效
 		this.load.audio("bgm", "sounds/music_loop.ogg");
-		this.load.audio("hit", "sounds/hit.ogg");
+		this.load.audio("hit", "sounds/purchase.ogg");
 		this.load.audio("lancer", "sounds/lancer.mp3");
 		this.load.audio("hurt", "sounds/hurt.wav");
-		this.load.audio("clickCake", "sounds/purchase.ogg");
+		this.load.audio("clickCake", "sounds/eatcake.ogg");
 		this.load.audio("showtime", "sounds/showtime.wav");
 		this.load.audio("clock", "sounds/clock.mp3");
+		this.load.audio("gameover", "sounds/gameover.wav");
 	},
 	create: function(){
 		// start the MainMenu state
