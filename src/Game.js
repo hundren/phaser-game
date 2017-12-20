@@ -80,8 +80,8 @@ Candy.Game.prototype = {
 		this.add.sprite(10, 5, 'score-bg');
 		// 加入美少女吃蛋糕饱肚血条
 		this.saliorLife=this.add.sprite(230,23, 'saliorLife',24);
-		this.saliorLife.animations.add('eatFat', [24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0], 10 /*fps */, false);
-		
+		// this.saliorLife.animations.add('eatFat', [24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0], 10 /*fps */, false);
+		this.saliorLife.animations.add('eatFat', [24,22,20,19,17,15,13,11,9,7,5,3,0], 10 /*fps */, false)
 		// add pause button
 		this.add.button(Candy.GAME_WIDTH-96-10, 5, 'button-pause', this.managePause, this);
 		var audioStatus = storageAPI.get('audio');
@@ -210,6 +210,8 @@ Candy.Game.prototype = {
 			// 血条减少
 			if(this.monsterLife.cropRect.width>0){
 				this.monsterLife.cropRect.width -= 0.5;
+				this.monsterLife.cropRect.color = '#fff';
+				
 			}
 	    }, this);
 	},
@@ -378,9 +380,9 @@ Candy.Game.prototype = {
 				Candy._candyGroup.removeChild(candy);
 					// candy.kill();
 					Candy.hurt.play();
-					Candy._fat += 1;
+					Candy._fat += 2;
 					that.saliorLife.animations.next();
-					that._player.scale.set(2+(Candy._fat)/10,3);
+					that._player.scale.set(2+(Candy._fat)/7,3);
 					 if(Candy._fat >= 5 && Candy._fat < 10){
 						that.addNoPush('cannotpush2');
 					}else if(Candy._fat >= 10 && Candy._fat < 15){
@@ -389,6 +391,7 @@ Candy.Game.prototype = {
 						that.addNoPush('cannotpush4');
 					}else if(Candy._fat > 24){
 					that._player.scale.set(5,3);
+					Candy.clock.stop();
 					that.state.start('GameOver');
 					Candy._score = 60;
 					}

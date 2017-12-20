@@ -6,6 +6,20 @@
 	<title>美少女吃蛋糕</title>
 	<link rel="stylesheet" type="text/css" href="css/font.css">
 	<style> body { margin: 0; background: #B4D9E7; } </style>
+	<script src="/lodash/lodash.min.js"></script>
+	<script src="/lowdb/dist/low.min.js"></script>
+	<script src="/lowdb/dist/LocalStorage.min.js"></script>
+	<script>
+		// 存本地json
+		var adapter = new LocalStorage('db')
+		var db = low(adapter)
+		db.defaults({ pxt: {} })
+		// Data is automatically saved to localStorage
+		db.set('pxt.choose', 'no')
+		.write()
+		var  pxtChoose = db.get('pxt.choose').value();
+		console.log(pxtChoose)
+	</script>
 	<script src="src/storage.js"></script>
 	<script src="src/phaser.min.js"></script>
 	<script src="src/floatingText.min.js"></script>
@@ -23,6 +37,7 @@
 		<p id="adTitle" style="position:fixed;top:0;left:0">Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
 <script>
 (function() {
+
 	// initialize the framework
 	var game = new Phaser.Game(640, 960, Phaser.AUTO, 'game');
 	// add game states
@@ -34,6 +49,8 @@
 	game.state.add('GoodEnd', Candy.GoodEnd);
 	// start the Boot state
 	game.state.start('Boot');
+
+	
 })();
 </script>
 </body>
