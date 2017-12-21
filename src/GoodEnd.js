@@ -12,19 +12,59 @@ Candy.GoodEnd = function (game){
 Candy.GoodEnd.prototype = {
 	create: function(){
         this.stage.backgroundColor = '#000';
-        
+        // 隐藏codingpage
+        document.getElementById('adTitle').style.display = 'none';
         this.content = [
-            "亲爱的:",
-            "很久没见",
-            "through the crowd around the door of the Chat. `It's like my body's developed",
-            "this massive drug deficiency.' It was a Sprawl voice and a Sprawl joke.",
-            "The Chatsubo was a bar for professional expatriates; you could drink there for",
-            "a week and never hear two words in Japanese.",
+            "亲 爱 的 PXT:",
+            "很 久 没 见",
+            "恭 喜 你 获 得 成 就：击 败 “ 一 只 喜 欢 喂 蛋 糕",
+            "给 美 少 女 吃 ，但 因 美 少 女 吃 得 太 多 会 胖，",
+            "所 以 无 奈 要 被 玩 家 消 灭 的 怪 兽。”",
             "",
-            "Ratz was tending bar, his prosthetic arm jerking monotonously as he filled a tray",
-            "of glasses with draft Kirin. He saw Case and smiled, his teeth a webwork of",
-            "East European steel and brown decay. Case found a place at the bar, between the",
-            "unlikely tan on one of Lonny Zone's whores and the crisp naval uniform of a tall",
+            "呵 呵 ， 我 想 我 就 是 那 只 怪 兽 ~",
+            "一 只 不 知 道 自 己 怎 么 会 被 消 灭 的 怪 兽",
+            "当 然 你 还 是 那 个 美 少 女",
+            "那 个 还 没 吃 胖 的 美 少 女 ~",
+            "",
+            "是 了 ， 看 到 这 你 可 能 还 是 有 个 疑 问，",
+            "没 错 ，P FOR PAN , X FOR XIAO , T FOR TING",
+            "世 界 就 是 这 么 奇 妙",
+            "",
+            "好 了 ， 我 们 还 是 马 上 进 入 正 题 ",
+            "继 续 谈 谈 我 这 个 将 会 获 奖 ， 然 后 分 分 钟 收 入",
+            "过 千 万 ， 风 摩 万 千 少 女 ，带 我 走 ",
+            "上 人 身 巅 峰 的 游 戏 的 制 作 的 心 路 历 程 吧",
+            "",
+            "当 然 ， 每 个 优 秀 的 游 戏 背 后 肯 定 少 不 了 一 个",
+            "优 秀 的 故 事 ：",
+            "我 们 的 这 个 当 然 也 不 例 外",
+            "",
+            "故 事 的 主 人 公 就 是 这 只 怪 兽 和 美 少 女",
+            "每 个 故 事 的 开 始 总 是 从 某 个 简 单 的 相 遇 开 始 的",
+            "细 想 一 下 ， 怪 兽 和 美 少 女 刚 相 遇 到 现 在",
+            "已 经 难 以 用 秒 来 计 算 了 ， 然 而 就 距 现 在",
+            "473，040，000 秒 前，神 奇 的 事 情 发 生 了",
+            "宇 宙 间 的 2 堆 原 子 团 产 生 了 一 次 近 距 离 接 触",
+            "从 此 历 史 的 前 轮 发 生 了 变 化",
+            "只 因 怪 兽 多 看 美 少 女 一 眼",
+            "",
+            "先 简 单 介 绍 一 下 故 事 的 背 景 吧",
+            "怪 兽 和 美 少 女 是 初 中 同 学",
+            "不 要 问 我 怪 兽 和 美 少 女 为 什 么",
+            "能 在 同 一 个 中 学 上 课",
+            "其 实 这 没 有 什 么 奇 怪 的",
+            "因 为", 
+            "他 们 还 有 一 个 瓜 很 大 的 历 史 老 师",
+            "M 字 头 的 物 理 老 师",
+            "等 等",
+            "",
+            "",
+            "The bartender's smile widened.In an age of",
+            "affordable beauty, there was something heraldic",
+            "arm whined as he reached for another mug.",
+            "",
+            "",
+            "From Neuromancer by William Gibson",
             "African whose cheekbones were ridged with precise rows of tribal scars. `Wage was",
             "in here early, with two joeboys,' Ratz said, shoving a draft across the bar with",
             "his good hand. `Maybe some business with you, Case?'",
@@ -38,8 +78,10 @@ Candy.GoodEnd.prototype = {
             "From Neuromancer by William Gibson"
         ];
         
-        
-        text = this.add.text(32, 32, '', { font: "22px 华文细黑", fill: "#19de65" });
+        console.log(pxtChoose);
+        text = this.add.text(32, 32, '', { font: "24px 华文细黑", fill: "#19de65" });
+        text.inputEnabled = true;
+        text.input.enableDrag();
         this.nextLine(this);
         },
        nextLine:function() {
