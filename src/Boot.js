@@ -13,6 +13,7 @@ Candy.Boot.prototype = {
 		this.scale.pageAlignVertically = true;
 		// this.scale.setScreenSize(true);
 		// start the Preloader state
+
 		this.state.start('Preloader');
 	}
 };

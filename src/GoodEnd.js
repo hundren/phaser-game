@@ -1,4 +1,5 @@
-
+var image = null;
+var emitter = null;
 Candy.GoodEnd = function (game){
     this.content = '';
     this.line = [];
@@ -83,6 +84,30 @@ Candy.GoodEnd.prototype = {
         text.inputEnabled = true;
         text.input.enableDrag();
         this.nextLine(this);
+
+        
+        // 心开始
+        var manager =  this.game.plugins.add(Phaser.ParticleStorm);
+
+        var data = {
+            lifespan: 3000
+        };
+
+        manager.addData('basic', data);
+
+        emitter = manager.createEmitter(Phaser.ParticleStorm.PIXEL);
+
+        emitter.renderer.pixelSize = 8;
+    
+        emitter.addToWorld();
+    
+        //  12 x 10 = 96 x 80 px
+        image = manager.createImageZone('heart');
+    
+        this.input.onDown.add(this.clickBoom, this);
+
+        // 心结束
+
         },
        nextLine:function() {
         
@@ -121,6 +146,15 @@ Candy.GoodEnd.prototype = {
                 //  Get the next line after the lineDelay amount of ms has elapsed
                 this.time.events.add(this.lineDelay, this.nextLine, this);
             }
+        
+        },
+     clickBoom(pointer) {
+
+            var x = pointer.x;
+            var y = pointer.y;
+        
+            //  This will apply the radiateFrom to only those particles emitted in this call
+            emitter.emit('basic', x - 48, y - 40, { zone: image, full: true, spacing: 8, setColor: true, radiateFrom: { x: x, y: y, velocity: 1 } });
         
         }
     }
