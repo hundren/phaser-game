@@ -30,14 +30,15 @@ Candy.MainMenu.prototype = {
 		storageAPI.initUnset('audio',true);
 		var audioStatus = storageAPI.get('audio');
 		audioButton.animations.play(audioStatus);
-		// 音效
+		// // 音效
 		fx = this.add.audio('bgm');
 		fx.play('',0,1,true,false);
 	},
 	startGame: function() {
 		// start the Game state
 		this.state.start('Game');
-		document.getElementById('adTitle').style.display='none'
+		
+		// document.getElementById('adTitle').style.display='none'
 	},
 	manageAudio: function() {
 		audioStatus =! audioStatus;

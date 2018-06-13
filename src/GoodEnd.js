@@ -14,7 +14,7 @@ Candy.GoodEnd.prototype = {
 	create: function(){
         this.stage.backgroundColor = '#000';
         // 隐藏codingpage
-        document.getElementById('adTitle').style.display = 'none';
+        // document.getElementById('adTitle').style.display = 'none';
         this.content = [
             "亲 爱 的 PXT:",
             "很 久 没 见",
@@ -82,29 +82,30 @@ Candy.GoodEnd.prototype = {
         console.log(pxtChoose);
         text = this.add.text(32, 32, '', { font: "24px 华文细黑", fill: "#19de65" });
         text.inputEnabled = true;
+        text.input.allowHorizontalDrag =false;
         text.input.enableDrag();
         this.nextLine(this);
 
         
         // 心开始
-        var manager =  this.game.plugins.add(Phaser.ParticleStorm);
+        // var manager =  this.game.plugins.add(Phaser.ParticleStorm);
 
-        var data = {
-            lifespan: 3000
-        };
+        // var data = {
+        //     lifespan: 3000
+        // };
 
-        manager.addData('basic', data);
+        // manager.addData('basic', data);
 
-        emitter = manager.createEmitter(Phaser.ParticleStorm.PIXEL);
+        // emitter = manager.createEmitter(Phaser.ParticleStorm.PIXEL);
 
-        emitter.renderer.pixelSize = 8;
+        // emitter.renderer.pixelSize = 8;
     
-        emitter.addToWorld();
+        // emitter.addToWorld();
     
-        //  12 x 10 = 96 x 80 px
-        image = manager.createImageZone('heart');
+        // //  12 x 10 = 96 x 80 px
+        // image = manager.createImageZone('heart');
     
-        this.input.onDown.add(this.clickBoom, this);
+        // this.input.onDown.add(this.clickBoom, this);
 
         // 心结束
 
@@ -156,6 +157,15 @@ Candy.GoodEnd.prototype = {
             //  This will apply the radiateFrom to only those particles emitted in this call
             emitter.emit('basic', x - 48, y - 40, { zone: image, full: true, spacing: 8, setColor: true, radiateFrom: { x: x, y: y, velocity: 1 } });
         
+        },
+        update: function(){
+            console.log(text)
+            if(text.position.y > 32){
+                text.position.y = 32
+            }
+            if(text.position.y+text._height < 200 && text._height >200){
+                text.position.y = -text._height+200
+            }
         }
     }
 

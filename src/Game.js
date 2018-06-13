@@ -67,9 +67,11 @@ Candy.Game = function(game){
 };
 Candy.Game.prototype = {
 	create: function(){
+		console.log('this',this);
+		
 		//插入全屏操作插件
-		this.game.touchControl = this.game.plugins.add(Phaser.Plugin.TouchControl);
-        this.game.touchControl.inputEnable();
+		// this.game.touchControl = this.game.plugins.add(Phaser.Plugin.TouchControl);
+        // this.game.touchControl.inputEnable();
 		// start the physics engine
 		this.physics.startSystem(Phaser.Physics.ARCADE);
 		// set the global gravity
@@ -269,7 +271,7 @@ Candy.Game.prototype = {
 		
 	},
 	update: function(){
-            var speed = this.game.touchControl.speed;
+            // var speed = this.game.touchControl.speed;
             //打击计数器
             this.hitCount+=1;
 			// 玩家随机运动
@@ -296,10 +298,10 @@ Candy.Game.prototype = {
        //**********
        //增加player高度
        //**********
-       if(speed.tap==1){
-       		// speed.tap=0;
-       		// this._player.position.y-=3.9;
-       }
+    //    if(speed.tap==1){
+    //    		// speed.tap=0;
+    //    		// this._player.position.y-=3.9;
+    //    }
 	   // 圆圈自减
 	//    Candy.angle.max = 8;
        if(Candy.angle.max>1.6 && Candy.angle.max<8){

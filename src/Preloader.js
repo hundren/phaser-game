@@ -49,19 +49,21 @@ Candy.Preloader.prototype = {
 		this.load.atlasJSONHash("coins", "img/coins.png", "img/coins.json");
 		
 		// 音效
-		// this.load.audio("bgm", "sounds/music_loop.ogg");
-		// this.load.audio("hit", "sounds/purchase.ogg");
-		// this.load.audio("lancer", "sounds/lancer.mp3");
-		// this.load.audio("hurt", "sounds/hurt.wav");
-		// this.load.audio("clickCake", "sounds/eatcake.ogg");
-		// this.load.audio("showtime", "sounds/showtime.wav");
-		// this.load.audio("clock", "sounds/clock.mp3");
-		// this.load.audio("gameover", "sounds/gameover.wav");
+		this.load.audio("bgm", "sounds/music_loop.ogg");
+		this.load.audio("hit", "sounds/purchase.ogg");
+		this.load.audio("lancer", "sounds/lancer.mp3");
+		this.load.audio("hurt", "sounds/hurt.wav");
+		this.load.audio("clickCake", "sounds/eatcake.ogg");
+		this.load.audio("showtime", "sounds/showtime.wav");
+		this.load.audio("clock", "sounds/clock.mp3");
+		this.load.audio("gameover", "sounds/gameover.wav");
 		
 	},
 	create: function(){
 		// start the MainMenu state
 		
 		this.state.start('GoodEnd');
+		// this.state.start('MainMenu');
+		
 	}
 };
