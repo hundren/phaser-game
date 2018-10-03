@@ -86,6 +86,10 @@ Candy.GoodEnd.prototype = {
         text.input.enableDrag();
         this.nextLine(this);
 
+            // 暂停音乐
+            fx.stop();
+            var fxx = this.add.audio('meet');
+            fxx.play('',0,1,true,false);
         
         // 心开始
         // var manager =  this.game.plugins.add(Phaser.ParticleStorm);
@@ -159,7 +163,7 @@ Candy.GoodEnd.prototype = {
         
         },
         update: function(){
-            console.log(text)
+            // console.log(text)
             if(text.position.y > 32){
                 text.position.y = 32
             }

@@ -211,9 +211,11 @@ Candy.Game.prototype = {
 			})
 			// 血条减少
 			if(this.monsterLife.cropRect.width>0){
-				this.monsterLife.cropRect.width -= 0.5;
+				this.monsterLife.cropRect.width -= 11.3;
 				this.monsterLife.cropRect.color = '#fff';
 				
+			}else{
+				this.state.start('GoodEnd');
 			}
 	    }, this);
 	},
