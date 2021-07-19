@@ -17,7 +17,7 @@ Candy.GoodEnd.prototype = {
         // document.getElementById('adTitle').style.display = 'none';
 
         this.content = [
-        
+          '大结局，未完待续。。。'
         ];
         
         console.log(pxtChoose);
